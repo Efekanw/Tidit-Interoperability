@@ -1,0 +1,18 @@
+{
+  "@context": [
+    "https://www.w3.org/2022/wot/td/v1.1",
+    {
+      "om2": "http://www.ontology-of-units-of-measure.org/resource/om-2/",
+      "time": "http://www.w3.org/2006/time#"
+    }
+  ],
+  "@type": "tm:ThingModel",
+  "Voltage": {
+    "@type": "om2:quantity",
+    "om2:hasValue": {
+      "@value": "232.36",
+      "@type": "xsd:decimal"
+    },
+    "om2:Unit": "om2:volt"
+  }
+}
