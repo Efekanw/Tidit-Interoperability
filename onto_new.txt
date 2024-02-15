@@ -68,10 +68,10 @@ curl --location --request PUT -u ditto:ditto 'http://localhost:8080/api/2/things
 }'
 
 
-curl --location --request GET -u ditto:ditto 'http://localhost:8080/api/2/things/test3:test3' \
+curl --location --request GET -u ditto:ditto 'http://localhost:8080/api/2/things/test4:test4' \
 --header 'Accept: application/td+json'
 
-curl --location --request PUT -u ditto:ditto 'http://localhost:8080/api/2/things/test3:test3' \
+curl --location --request PUT -u ditto:ditto 'http://localhost:8080/api/2/things/test4:test4' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "definition": "https://github.com/Efekanw/ditto/blob/main/test.jsonld"

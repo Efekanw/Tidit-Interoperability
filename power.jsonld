@@ -33,14 +33,14 @@
     }
   },
   "events": {
-    "reportedPower": {
-      "title": "Power",
-      "description": "Measurement of the power consumption.",
+    "current-power-consumption": {
+      "title": "Current power consumption",
+      "description": "Measurement of the current power consumption.",
       "data": {
-        "@type": "om2:Quantity",
-        "title": "Consumption in power.",
+        "@type": "om2:Power",
+        "title": "Consumption in kW.",
         "type": "number",
-        "om2:Unit": "om2:watt",
+        "unit": "om2:kilowatt",
         "minimum": 0.0
       }
     }
