@@ -22,7 +22,14 @@
           "type": "boolean",
           "default": false
         }
-      }
+      },
+      "interval": {
+          "@type": "time:Duration",
+          "title": "Reporting interval",
+          "type": "integer",
+          "unit": "time:seconds",
+          "default": 30
+        }
     }
   },
   "events": {
