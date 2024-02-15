@@ -64,7 +64,7 @@
 curl --location --request PUT -u ditto:ditto 'http://localhost:8080/api/2/things/io.eclipseprojects.ditto:floor-lamp' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "definition": "https://eclipse-ditto.github.io/ditto-examples/wot/models/floor-lamp-1.0.0.tm.jsonld"
+    "definition": "https://github.com/Efekanw/ditto/blob/main/ontol.jsonld"
 }'
 
 
@@ -74,5 +74,5 @@ curl --location --request GET -u ditto:ditto 'http://localhost:8080/api/2/things
 curl --location --request PUT -u ditto:ditto 'http://localhost:8080/api/2/things/test5:test5' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "definition": "https://github.com/Efekanw/ditto/blob/main/test.jsonld"
+    "definition": "https://raw.githubusercontent.com/Efekanw/ditto/main/test.jsonld"
 }'

@@ -15,13 +15,13 @@
   "links": [
     {
       "rel": "tm:submodel",
-      "href": "https://github.com/Efekanw/ditto/blob/main/voltage.jsonld",
+      "href": "https://raw.githubusercontent.com/Efekanw/ditto/main/voltage.jsonld",
       "type": "application/tm+json",
       "instanceName": "Voltage"
     },
     {
       "rel": "tm:submodel",
-      "href": "https://github.com/Efekanw/ditto/blob/main/power.jsonld",
+      "href": "https://raw.githubusercontent.com/Efekanw/ditto/main/power.jsonld",
       "type": "application/tm+json",
       "instanceName": "Active Power"
     }
