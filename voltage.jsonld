@@ -22,21 +22,8 @@
             "title": "Consumption in kV.",
             "om2:Unit": "om2:kilovolt",
             "minimum": 0.0
-        },
-        "enabled": {
-          "title": "Reporting enabled",
-          "type": "boolean",
-          "default": false
-        },
-        "interval": {
-          "@type": "time:Duration",
-          "title": "Reporting interval",
-          "type": "integer",
-          "unit": "time:seconds",
-          "default": 30
         }
       }
-
     }
   }
 }

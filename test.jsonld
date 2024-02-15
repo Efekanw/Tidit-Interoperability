@@ -4,7 +4,6 @@
     {
       "om2": "http://www.ontology-of-units-of-measure.org/resource/om-2/",
       "time": "http://www.w3.org/2006/time#"
-      "sosa": "http://www.w3.org/ns/sosa/"
     }
   ],
   "@type": "tm:ThingModel",
