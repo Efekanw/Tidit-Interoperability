@@ -1,0 +1,41 @@
+{
+  "@context": [
+    "https://www.w3.org/2022/wot/td/v1.1",
+    {
+      "om2": "http://www.ontology-of-units-of-measure.org/resource/om-2/"
+    }
+  ],
+  "@type": "tm:ThingModel",
+  "title": "Voltage",
+  "version": {
+    "model": "1.0.0"
+  },
+  "tm:optional": [],
+  "properties": {
+    "Voltage": {
+      "title": "Report voltage",
+      "description": "Configuration whether the voltage consumption should be published via event 'reportedVoltage'.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "title": "Reporting enabled",
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  },
+  "events": {
+    "reportedVoltage": {
+      "title": "Voltage",
+      "description": "Measurement of the voltage consumption.",
+      "data": {
+        "@type": "om2:Quantity",
+        "title": "Consumption in volt.",
+        "type": "number",
+        "unit": "om2:volt",
+        "minimum": 0.0
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "@context": {
+    "qudt": "http://qudt.org/schema/qudt#",
+    "unit": "http://qudt.org/vocab/unit#",
+    "td": "https://www.w3.org/2019/wot/td/v1"
+  },
+  "@type": "qudt:QuantityValue",
+  "qudt:value": 223.81,
+  "qudt:unit": "unit:V"
+}

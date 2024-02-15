@@ -1,0 +1,69 @@
+{
+  "@context": [
+    "https://www.w3.org/2022/wot/td/v1.1",
+    {
+      "om2": "http://www.ontology-of-units-of-measure.org/resource/om-2/",
+      "time": "http://www.w3.org/2006/time#"
+    }
+  ],
+  "@type": "tm:ThingModel",
+  "Voltage": {
+    "@type": "om2:quantity",
+    "om2:hasValue": {
+      "@value": "232.36",
+      "@type": "xsd:decimal"
+    },
+    "om2:Unit": "om2:volt"
+  }
+}
+
+{
+  "@context": [
+    "https://www.w3.org/2022/wot/td/v1.1",
+    {
+      "om2": "http://www.ontology-of-units-of-measure.org/resource/om-2/",
+      "time": "http://www.w3.org/2006/time#"
+    }
+  ],
+  "@type": "tm:ThingModel",
+  "title": "my Sensor",
+  "description": "Sensor",
+  "version": {
+    "model": "1.0.0"
+  },
+  "links": [
+    {
+      "rel": "tm:submodel",
+      "href": "https://eclipse-ditto.github.io/ditto-examples/wot/models/dimmable-colored-lamp-1.0.0.tm.jsonld",
+      "type": "application/tm+json",
+      "instanceName": "Voltage"
+    },
+    {
+      "rel": "tm:submodel",
+      "href": "https://eclipse-ditto.github.io/ditto-examples/wot/models/dimmable-colored-lamp-1.0.0.tm.jsonld",
+      "type": "application/tm+json",
+      "instanceName": "Active Power"
+    }
+  ],
+  "tm:optional": [],
+  "properties": {
+    "manufacturer": {
+      "title": "Manufacturer",
+      "type": "string",
+      "readOnly": true
+    },
+    "serialNo": {
+      "title": "Serial number",
+      "type": "string",
+      "readOnly": true
+    }
+  }
+}
+
+
+
+curl --location --request PUT -u ditto:ditto 'http://localhost:8080/api/2/things/foo:bar' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "definition": "https://github.com/Efekanw/ditto/blob/main/test.jsonld"
+}'
