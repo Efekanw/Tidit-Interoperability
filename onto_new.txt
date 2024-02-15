@@ -68,11 +68,70 @@ curl --location --request PUT -u ditto:ditto 'http://localhost:8080/api/2/things
 }'
 
 
-curl --location --request GET -u ditto:ditto 'http://localhost:8080/api/2/things/test5:test5' \
+curl --location --request GET -u ditto:ditto 'http://localhost:8080/api/2/things/test0:test0' \
 --header 'Accept: application/td+json'
 
-curl --location --request PUT -u ditto:ditto 'http://localhost:8080/api/2/things/test5:test5' \
+curl --location --request PUT -u ditto:ditto 'http://localhost:8080/api/2/things/test0:test0' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "definition": "https://raw.githubusercontent.com/Efekanw/ditto/main/test.jsonld"
+}'
+
+
+"incomingScript":
+ "function mapToDittoProtocolMsg(headers, textPayload, bytePayload, contentType)
+  {
+    const jsonString = String.fromCharCode.apply(null, new Uint8Array(bytePayload));
+    const jsonData = JSON.parse(jsonString);
+    const key = Object.keys(jsonData)[0];
+    const temp = jsonData[key];
+    const topic = `test0/test0/things/twin/commands/modify`;
+    const path = `/features/${key}/properties/value`;
+     const val = parseFloat(temp.value);
+    return { 'topic': topic, 'path': path, 'value': val
+    };
+  }"
+
+curl -X POST 'http://localhost:8080/devops/piggyback/connectivity' -u devops:foobar -H 'Content-Type: application/json' -d '{
+    "targetActorSelection": "/system/sharding/connection",
+    "headers": {
+        "aggregate": false
+    },
+    "piggybackCommand": {
+        "type": "connectivity.commands:createConnection",
+        "connection": {
+            "id": "test0:gateway-mqtt-connection",
+            "connectionType": "mqtt",
+            "connectionStatus": "open",
+            "failoverEnabled": true,
+            "uri": "ssl://arge:CP8rHfzD5LtUENEi@172.16.21.127:8883",
+            "validateCertificates": true,
+            "ca": "-----BEGIN CERTIFICATE-----\nMIIDWTCCAkGgAwIBAgIUZ3n7ap6OFm51NwqbqoC17C5kcY4wDQYJKoZIhvcNAQEL\nBQAwPDEVMBMGA1UEAwwMOTUuMC4xODkuMTQ0MQswCQYDVQQGEwJVUzEWMBQGA1UE\nBwwNU2FuIEZyYW5zaXNjbzAeFw0yMzA3MjYwODMyMDBaFw0yNDA3MTYwODMyMDBa\nMDwxFTATBgNVBAMMDDk1LjAuMTg5LjE0NDELMAkGA1UEBhMCVVMxFjAUBgNVBAcM\nDVNhbiBGcmFuc2lzY28wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCu\nSux0i2MvjAtEy0skZOPALuSoBdyZmjv6LE1HmC017Dwyut5AsMXp49INuAmNxV2A\nAF4TX3VgZn6gN6mnEgKRe7rmE9Hfe9vaHVUUVqdXGsFYIFab4myyf47hnAmywM+9\nW+KnN0WPMj3+cLa0tc9smrR6QppoPw2ND05/DJH/MwqXdaBCkIThoGFbVPt3yGKa\nQvyGfEXCnaPo3KtbK7GqQn1Ru4lvYwyNpXjQOdhNVhg55At8G+MN/q8sn3CLj8uQ\n1Uh4czDewlvDHWWfMDS0/JODxXSDgJtKCKKlCjAg6+8Npv94jjDMQlll+5WO+rUV\naZ+yUA1fLiuN8mbAx0ovAgMBAAGjUzBRMB0GA1UdDgQWBBSpp71J+e5IX/47yerF\n0RRBKVWG8zAfBgNVHSMEGDAWgBSpp71J+e5IX/47yerF0RRBKVWG8zAPBgNVHRMB\nAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQAMuga2nJ5dv9Zk+cqpgztEW6bH\ncxNBmFUBhYAn5hu4xhUkwe6KMCQRCsMJdM0H8mUOAWe45Qm386YzP3ooY4EVBv27\nvW8FM9hpX45s9bxFSwjoR2atykQTS25sfIjcU2dtNGQ9R/CiCL+p7QK9JUqkf/Bm\npHsaxAlMx9R4fcVFA3ffBQXBfaxvkMt1YxXYM6qRimGVpGJ7K3C85ob4cak+D9jX\nnptrnmMO/Gh0Vq5NsrbEy/2gS9mZVi1Ch6iVqyQTt2LO9k0YfRBC2JiF9AqpJxU1\nAlrSsMUwBz4B2f1zIb4U0rXXVaemW3rsKWy0+//7XYAdOp4YdxGnLH8ZnuJ2\n-----END CERTIFICATE-----",
+            "sources": [
+                {
+                    "addresses": [
+                        "/sayac"
+                    ],
+                    "authorizationContext": [
+                        "nginx:ditto"
+                    ],
+                    "replyTarget": {
+                        "enabled": false
+                    },
+                    "headerMapping": {
+                        "content-type": { "content-type": "application/octet-stream" }
+                    },
+                    "qos": 0,
+                    "filters": []
+                }
+            ],
+            "targets": [],
+            "mappingContext": {
+                "mappingEngine": "JavaScript",
+                "options": {
+                    "incomingScript": "function mapToDittoProtocolMsg(headers, textPayload, bytePayload, contentType) { const jsonString = String.fromCharCode.apply(null, new Uint8Array(bytePayload)); const jsonData = JSON.parse(jsonString); const key = Object.keys(jsonData)[0]; const temp = jsonData[key]; const topic = `test0/test0/things/twin/commands/modify`; const path = `/features/${key}/properties/value`; const val = parseFloat(temp.value); return { 'topic': topic, 'path': path, 'value': val }; }"
+                }
+            }
+        }
+    }
 }'

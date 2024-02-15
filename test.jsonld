@@ -23,7 +23,7 @@
       "rel": "tm:submodel",
       "href": "https://raw.githubusercontent.com/Efekanw/ditto/main/power.jsonld",
       "type": "application/tm+json",
-      "instanceName": "Active Power"
+      "instanceName": "ActivePower"
     }
   ],
   "tm:optional": [],

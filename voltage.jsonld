@@ -15,32 +15,11 @@
     "Voltage": {
       "title": "Report voltage",
       "description": "Configuration whether the voltage consumption should be published via event 'reportedVoltage'.",
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "title": "Reporting enabled",
-          "type": "boolean",
-          "default": false
-        },
-        "interval": {
-          "@type": "time:Duration",
-          "title": "Reporting interval",
-          "type": "integer",
-          "unit": "time:seconds",
-          "default": 30
-        }
-      }
-    }
-  },
-  "events": {
-    "current-power-consumption": {
-      "title": "Current power consumption",
-      "description": "Measurement of the current power consumption.",
       "data": {
-        "@type": "om2:Power",
+        "@type": "om2:Quantity",
         "title": "Consumption in kW.",
         "type": "number",
-        "unit": "om2:kilowatt",
+        "om2:Unit": "om2:volt",
         "minimum": 0.0
       }
     }
