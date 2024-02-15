@@ -19,8 +19,8 @@
       "properties": {
         "data": {
             "@type": "om2:Quantity",
-            "title": "Consumption in kW.",
-            "om2:Unit": "om2:kilowatt",
+            "title": "Consumption in kV.",
+            "om2:Unit": "om2:kilovolt",
             "minimum": 0.0
         }
       }

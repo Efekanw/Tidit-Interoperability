@@ -12,7 +12,7 @@
   },
   "tm:optional": [],
   "properties": {
-    "Power": {
+    "ActivePower": {
       "title": "Report Power",
       "description": "Configuration whether the voltage consumption should be published via event 'reportedPower'.",
       "type": "object",
