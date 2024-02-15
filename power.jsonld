@@ -14,7 +14,7 @@
   "properties": {
     "ActivePower": {
       "title": "Report Power",
-      "description": "Configuration whether the voltage consumption should be published via event 'reportedPower'.",
+      "description": "Active power consumption",
       "type": "object",
       "properties": {
         "data": {
