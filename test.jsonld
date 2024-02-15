@@ -38,5 +38,12 @@
       "type": "string",
       "readOnly": true
     }
+  },
+  "actions": {
+    "switch-all-spots": {
+      "title": "Switch all spots",
+      "description": "Switches all spots (1-3) on/off based on the passed in boolean.",
+      "type": "boolean"
+    }
   }
 }
