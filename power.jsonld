@@ -33,7 +33,7 @@
         "@type": "om2:Quantity",
         "title": "Consumption in power.",
         "type": "number",
-        "unit": "om2:watt",
+        "om2:Unit": "om2:watt",
         "minimum": 0.0
       }
     }

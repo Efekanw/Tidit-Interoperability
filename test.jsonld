@@ -7,12 +7,36 @@
     }
   ],
   "@type": "tm:ThingModel",
-  "Voltage": {
-    "@type": "om2:quantity",
-    "om2:hasValue": {
-      "@value": "232.36",
-      "@type": "xsd:decimal"
+  "title": "my Sensor",
+  "description": "Sensor",
+  "version": {
+    "model": "1.0.0"
+  },
+  "links": [
+    {
+      "rel": "tm:submodel",
+      "href": "https://github.com/Efekanw/ditto/blob/main/voltage.jsonld",
+      "type": "application/tm+json",
+      "instanceName": "Voltage"
     },
-    "om2:Unit": "om2:volt"
+    {
+      "rel": "tm:submodel",
+      "href": "https://github.com/Efekanw/ditto/blob/main/power.jsonld",
+      "type": "application/tm+json",
+      "instanceName": "Active Power"
+    }
+  ],
+  "tm:optional": [],
+  "properties": {
+    "manufacturer": {
+      "title": "Manufacturer",
+      "type": "string",
+      "readOnly": true
+    },
+    "serialNo": {
+      "title": "Serial number",
+      "type": "string",
+      "readOnly": true
+    }
   }
 }
