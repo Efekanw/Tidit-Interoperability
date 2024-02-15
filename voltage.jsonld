@@ -15,13 +15,16 @@
     "Voltage": {
       "title": "Report voltage",
       "description": "Configuration whether the voltage consumption should be published via event 'reportedVoltage'.",
-      "data": {
-        "@type": "om2:Quantity",
-        "title": "Consumption in kW.",
-        "type": "number",
-        "om2:Unit": "om2:volt",
-        "minimum": 0.0
+      "properties": {
+          "data": {
+            "@type": "om2:Quantity",
+            "title": "Consumption in kW.",
+            "type": "number",
+            "om2:Unit": "om2:volt",
+            "minimum": 0.0
+          }
       }
+
     }
   }
 }

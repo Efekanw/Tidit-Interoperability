@@ -23,7 +23,7 @@
         "type": "number",
         "om2:Unit": "om2:kilowatt",
         "minimum": 0.0
-      }
+        }
       }
     }
   }
