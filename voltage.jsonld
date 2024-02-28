@@ -6,24 +6,15 @@
     }
   ],
   "@type": "tm:ThingModel",
-  "title": "Voltage",
-  "version": {
-    "model": "1.0.0"
-  },
-  "tm:optional": [],
+  "title": "VoltageFeature",
   "properties": {
     "Voltage": {
-      "title": "Report voltage",
       "description": "Voltage consumption.",
-      "type": "object",
-      "properties": {
-        "data": {
-            "@type": "om2:Quantity",
-            "title": "Consumption in kV.",
-            "om2:Unit": "om2:kilovolt",
-            "minimum": 0.0
-        }
-      }
+      "@type": "om2:Quantity",
+      "title": "Consumption in kV.",
+      "om2:Unit": "om2:kilovolt",
+      "minimum": 0.0,
+      "links": [{"href": "/things/sensor:4/properties/level"}]
     }
   }
 }
