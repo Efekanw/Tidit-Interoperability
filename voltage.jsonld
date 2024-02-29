@@ -14,7 +14,7 @@
       "title": "Consumption in kV.",
       "om2:Unit": "om2:kilovolt",
       "minimum": 0.0,
-      "links": [{"href": "/things/sensor:4/features/Voltage/properties}]
+      "links": [{"href": "/things/sensor:4/features/Voltage/properties"}]
     }
   }
 }

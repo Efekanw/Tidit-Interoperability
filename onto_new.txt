@@ -71,7 +71,7 @@ curl --location --request PUT -u ditto:ditto 'http://localhost:8080/api/2/things
 curl --location --request GET -u ditto:ditto 'http://localhost:8080/api/2/things/test1:test0' \
 --header 'Accept: application/td+json'
 
-curl --location --request PUT -u ditto:ditto 'http://localhost:8080/api/2/things/test11:test11' \
+curl --location --request PUT -u ditto:ditto 'http://localhost:8080/api/2/things/sensor:6' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "definition": "https://raw.githubusercontent.com/Efekanw/ditto/main/test.jsonld"
@@ -100,7 +100,7 @@ curl -X POST 'http://localhost:8080/devops/piggyback/connectivity' -u devops:foo
     "piggybackCommand": {
         "type": "connectivity.commands:createConnection",
         "connection": {
-            "id": "test0:gateway-mqtt-connection",
+            "id": "sensor:6",
             "connectionType": "mqtt",
             "connectionStatus": "open",
             "failoverEnabled": true,
@@ -129,7 +129,7 @@ curl -X POST 'http://localhost:8080/devops/piggyback/connectivity' -u devops:foo
             "mappingContext": {
                 "mappingEngine": "JavaScript",
                 "options": {
-                    "incomingScript": "function mapToDittoProtocolMsg(headers, textPayload, bytePayload, contentType) { const jsonString = String.fromCharCode.apply(null, new Uint8Array(bytePayload)); const jsonData = JSON.parse(jsonString); const key = Object.keys(jsonData)[0]; const temp = jsonData[key]; const topic = `test0/test0/things/twin/commands/modify`; const path = `/features/${key}/properties/value`; const val = parseFloat(temp.value); return { 'topic': topic, 'path': path, 'value': val }; }"
+                    "incomingScript": "function mapToDittoProtocolMsg(headers, textPayload, bytePayload, contentType) { const jsonString = String.fromCharCode.apply(null, new Uint8Array(bytePayload)); const jsonData = JSON.parse(jsonString); const key = Object.keys(jsonData)[0]; const temp = jsonData[key]; const topic = `sensor/6/things/twin/commands/modify`; const path = `/features/${key}/properties/value`; const val = parseFloat(temp.value); return { 'topic': topic, 'path': path, 'value': val }; }"
                 }
             }
         }
