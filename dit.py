@@ -3,7 +3,7 @@ from requests.auth import HTTPBasicAuth
 import requests
 import json
 
-ditto_url = 'http://localhost:8080/api/2/things/sensor:4/features/Voltage/definition'
+ditto_url = 'http://localhost:8080/api/2'
 username = "admin"
 password = "VLmJN7HfFDAOrNI"
 
@@ -11,20 +11,19 @@ password = "VLmJN7HfFDAOrNI"
 def listen_to_event_stream(url):
 
     auth = HTTPBasicAuth("ditto", "ditto")
-    response = requests.get(url, auth=auth)
 
-    # messages = SSEClient(url, auth=auth)
-    content = response.text.strip('[]')
-    content = content.strip('"')
-    print(content)
-
-    jsonld_str = requests.get(content).text
-    jsonld_content = json.loads(jsonld_str)
-    print(jsonld_content)
-
-    feature_link = jsonld_content["properties"]["Voltage"]["links"]
-    print(feature_link)
-
+    #Ditto Thing özellik tanımına istek
+    feature_url = ditto_url + '/things/sensor:4/features'
+    response = requests.get(feature_url, auth=auth)
+    feature_json = json.loads(response.text)
+    for key in feature_json:
+        tfd_link = feature_json[key]["definition"][0].strip('[]').strip('"')
+        tfd_str = requests.get(tfd_link).text
+        tfd = json.loads(tfd_str)
+        feature_link = tfd["properties"][key]["links"][0]["href"]
+        feature_link = ditto_url + feature_link
+        feature_value = requests.get(feature_link, auth=auth).text
+        print(feature_value)
 
 
 if __name__ == "__main__":

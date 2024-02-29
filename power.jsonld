@@ -6,24 +6,15 @@
     }
   ],
   "@type": "tm:ThingModel",
-  "title": "Power",
-  "version": {
-    "model": "1.0.0"
-  },
-  "tm:optional": [],
+  "title": "ActivePowerFeature",
   "properties": {
     "ActivePower": {
-      "title": "Report Power",
-      "description": "Active power consumption",
-      "type": "object",
-      "properties": {
-        "data": {
-            "@type": "om2:Quantity",
-            "title": "Consumption in kW.",
-            "om2:Unit": "om2:kilowatt",
-            "minimum": 0.0
-        }
-      }
+      "description": "Active power consumption.",
+      "@type": "om2:Quantity",
+      "title": "Consumption in kW.",
+      "om2:Unit": "om2:kilowatt",
+      "minimum": 0.0,
+      "links": [{"href": "/things/sensor:4/features/ActivePower/properties"}]
     }
   }
 }
