@@ -1,6 +1,7 @@
 import pycamunda.externaltask
 import json
 
+
 class ExternalTaskException(Exception):
     def __init__(self, *args, message, details='', retry_timeout=15000, **kwargs):
         super().__init__(*args, **kwargs)
