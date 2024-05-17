@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0ymw50w" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.16.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.19.0">
+  <bpmn:process id="tidit_id" name="tidit" isExecutable="true" camunda:historyTimeToLive="3">
+    <bpmn:intermediateCatchEvent id="Event_09txu74" name="mqttDataReceived">
+      <bpmn:incoming>Flow_03apilp</bpmn:incoming>
+      <bpmn:incoming>Flow_1qmshdd</bpmn:incoming>
+      <bpmn:outgoing>Flow_03apilp</bpmn:outgoing>
+      <bpmn:outgoing>Flow_068dox5</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_126cro3" messageRef="Message_1mb8f2k" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="Activity_1fb5eym" name="Check Voltage" camunda:type="external" camunda:topic="processVoltage">
+      <bpmn:incoming>Flow_01z3v90</bpmn:incoming>
+      <bpmn:outgoing>Flow_09juvq3</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_03apilp" sourceRef="Event_09txu74" targetRef="Event_09txu74" />
+    <bpmn:sequenceFlow id="Flow_068dox5" sourceRef="Event_09txu74" targetRef="Gateway_029hl1j" />
+    <bpmn:exclusiveGateway id="Gateway_029hl1j">
+      <bpmn:incoming>Flow_068dox5</bpmn:incoming>
+      <bpmn:outgoing>Flow_01z3v90</bpmn:outgoing>
+      <bpmn:outgoing>Flow_114ek7n</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0us7kwo</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_01z3v90" name="data == Voltage" sourceRef="Gateway_029hl1j" targetRef="Activity_1fb5eym">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="javascript">// Assuming jsonData is the string containing the JSON data
+var jsonData = '{"Voltage": {"value": "226.56", "timestamp": "2024-05-16T10:52:15"}}';
+
+var jsonVariable = execution.getVariable('data');
+var jsonObject = JSON.parse(jsonVariable );
+// Check if the "Voltage" key exists in the object
+if (jsonObject.hasOwnProperty("Voltage")) {
+    // "Voltage" key exists
+    var voltageValue = jsonObject["Voltage"].value;
+    console.log("Voltage key exists. Value:", voltageValue);
+    true;
+} else {
+    // "Voltage" key does not exist
+    console.log("Voltage key does not exist.");
+    false;
+
+}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_114ek7n" name="data == Current" sourceRef="Gateway_029hl1j" targetRef="Activity_0ro8uri">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="javascript">var jsonVariable = execution.getVariable('data');
+var jsonObject = JSON.parse(jsonVariable );
+// Check if the "Current" key exists in the object
+if (jsonObject.hasOwnProperty("Current")) {
+    // "Voltage" key exists
+    var currentValue= jsonObject["Current"].value;
+    console.log("Current key exists. Value:", currentValue);
+    true;
+} else {
+    // "Current " key does not exist
+    console.log("Current key does not exist.");
+    false;
+}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0us7kwo" name="data != Current &#38;&#38; data != Voltage" sourceRef="Gateway_029hl1j" targetRef="Event_0yhf7my">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="javascript">var jsonVariable = execution.getVariable('data');
+var jsonObject = JSON.parse(jsonVariable );
+// Check if the "Current" key exists in the object
+if (!jsonObject.hasOwnProperty("Current") &amp;&amp; !jsonObject.hasOwnProperty("Voltage")) {
+    console.log("END");
+    true;
+} else {
+    console.log("NOT END");
+    false;
+}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="Activity_0ro8uri" name="Check Current" camunda:type="external" camunda:topic="processCurrent">
+      <bpmn:incoming>Flow_114ek7n</bpmn:incoming>
+      <bpmn:outgoing>Flow_0en21i6</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_0yhf7my" name="End Process">
+      <bpmn:incoming>Flow_0us7kwo</bpmn:incoming>
+      <bpmn:incoming>Flow_09juvq3</bpmn:incoming>
+      <bpmn:incoming>Flow_0en21i6</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_09juvq3" sourceRef="Activity_1fb5eym" targetRef="Event_0yhf7my" />
+    <bpmn:sequenceFlow id="Flow_0en21i6" sourceRef="Activity_0ro8uri" targetRef="Event_0yhf7my" />
+    <bpmn:startEvent id="tidit" name="Start Process">
+      <bpmn:outgoing>Flow_1qmshdd</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1qmshdd" sourceRef="tidit" targetRef="Event_09txu74" />
+  </bpmn:process>
+  <bpmn:message id="Message_1mb8f2k" name="mqttDataReceived" />
+  <bpmn:message id="Message_3rmupm6" name="Message_3rmupm6" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="tidit_id">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="tidit" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="179" y="239" width="36" height="36" />
+        <bpmndi:BPMNLabel color:color="#205022">
+          <dc:Bounds x="164" y="282" width="67" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_09txu74_di" bpmnElement="Event_09txu74" bioc:stroke="#5b176d" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#5b176d">
+        <dc:Bounds x="372" y="239" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="347" y="202" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_029hl1j_di" bpmnElement="Gateway_029hl1j" isMarkerVisible="true" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="475" y="232" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1fb5eym_di" bpmnElement="Activity_1fb5eym" bioc:stroke="#0d4372" bioc:fill="#bbdefb" color:background-color="#bbdefb" color:border-color="#0d4372">
+        <dc:Bounds x="870" y="217" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0mwc4at_di" bpmnElement="Activity_0ro8uri" bioc:stroke="#0d4372" bioc:fill="#bbdefb" color:background-color="#bbdefb" color:border-color="#0d4372">
+        <dc:Bounds x="870" y="320" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0yhf7my_di" bpmnElement="Event_0yhf7my" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="1242" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel color:color="#205022">
+          <dc:Bounds x="1228" y="83" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1qmshdd_di" bpmnElement="Flow_1qmshdd">
+        <di:waypoint x="215" y="257" />
+        <di:waypoint x="372" y="257" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03apilp_di" bpmnElement="Flow_03apilp">
+        <di:waypoint x="390" y="275" />
+        <di:waypoint x="390" y="295" />
+        <di:waypoint x="352" y="295" />
+        <di:waypoint x="352" y="257" />
+        <di:waypoint x="372" y="257" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_068dox5_di" bpmnElement="Flow_068dox5">
+        <di:waypoint x="408" y="257" />
+        <di:waypoint x="475" y="257" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01z3v90_di" bpmnElement="Flow_01z3v90">
+        <di:waypoint x="525" y="257" />
+        <di:waypoint x="870" y="257" />
+        <bpmndi:BPMNLabel color:color="#5b176d">
+          <dc:Bounds x="701" y="266" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_114ek7n_di" bpmnElement="Flow_114ek7n">
+        <di:waypoint x="500" y="282" />
+        <di:waypoint x="500" y="360" />
+        <di:waypoint x="870" y="360" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="701" y="373" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0us7kwo_di" bpmnElement="Flow_0us7kwo">
+        <di:waypoint x="500" y="232" />
+        <di:waypoint x="500" y="120" />
+        <di:waypoint x="1242" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="702" y="130" width="75" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09juvq3_di" bpmnElement="Flow_09juvq3">
+        <di:waypoint x="970" y="257" />
+        <di:waypoint x="1250" y="257" />
+        <di:waypoint x="1250" y="135" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0en21i6_di" bpmnElement="Flow_0en21i6">
+        <di:waypoint x="970" y="360" />
+        <di:waypoint x="1270" y="360" />
+        <di:waypoint x="1270" y="135" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
