@@ -1,0 +1,415 @@
+[
+    {
+        "id": "16aa391b2d5c5413",
+        "type": "tab",
+        "label": "Flow 4",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "2f82d9599fec145e",
+        "type": "switch",
+        "z": "16aa391b2d5c5413",
+        "name": "Voltage +- %6",
+        "property": "payload[\"Voltage\"][\"value\"]",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lt",
+                "v": "216.2",
+                "vt": "str"
+            },
+            {
+                "t": "gt",
+                "v": "243.8",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 540,
+        "y": 300,
+        "wires": [
+            [
+                "fc552a3a31467eb4"
+            ],
+            [
+                "59c9f16f4ecbd2f3"
+            ],
+            [
+                "f3f1329a4f630a86"
+            ]
+        ]
+    },
+    {
+        "id": "aaba5ef77b7d6ad8",
+        "type": "mqtt in",
+        "z": "16aa391b2d5c5413",
+        "name": "mqtt-sayac",
+        "topic": "/sayac",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "57e7603d40147381",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 225,
+        "y": 300,
+        "wires": [
+            [
+                "d0b532dd70d5870b",
+                "4e3d199931aaae26"
+            ]
+        ],
+        "l": false
+    },
+    {
+        "id": "d0b532dd70d5870b",
+        "type": "switch",
+        "z": "16aa391b2d5c5413",
+        "name": "filterVoltage",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "Voltage",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 370,
+        "y": 300,
+        "wires": [
+            [
+                "2f82d9599fec145e"
+            ]
+        ]
+    },
+    {
+        "id": "63a6916604f38572",
+        "type": "http request",
+        "z": "16aa391b2d5c5413",
+        "name": "Patch event",
+        "method": "use",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://ditto.tidit.meetsper.com/api/2/things/org.acme:innova1-tenant-messages/features/events/properties",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "other",
+                "keyValue": "content-type",
+                "valueType": "other",
+                "valueValue": "application/merge-patch+json"
+            }
+        ],
+        "x": 1230,
+        "y": 420,
+        "wires": [
+            [
+                "98c6dfed8f22d589"
+            ]
+        ]
+    },
+    {
+        "id": "f3f1329a4f630a86",
+        "type": "change",
+        "z": "16aa391b2d5c5413",
+        "name": "Normal",
+        "rules": [
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "PATCH",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload.lowVoltage",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "payload.highVoltage",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "move",
+                "p": "payload.Voltage.value",
+                "pt": "msg",
+                "to": "payload.voltageValue",
+                "tot": "msg"
+            },
+            {
+                "t": "delete",
+                "p": "payload.Voltage",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 760,
+        "y": 360,
+        "wires": [
+            [
+                "4fa3242fd6f46fda"
+            ]
+        ]
+    },
+    {
+        "id": "98c6dfed8f22d589",
+        "type": "debug",
+        "z": "16aa391b2d5c5413",
+        "name": "debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "statusCode",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1390,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "4fa3242fd6f46fda",
+        "type": "function",
+        "z": "16aa391b2d5c5413",
+        "name": "Voltage2Float",
+        "func": "msg.payload.voltageValue = parseFloat(msg.payload.voltageValue);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 980,
+        "y": 300,
+        "wires": [
+            [
+                "63a6916604f38572"
+            ]
+        ]
+    },
+    {
+        "id": "287bf8a9639b9b77",
+        "type": "function",
+        "z": "16aa391b2d5c5413",
+        "name": "check hour",
+        "func": "const current = parseFloat(msg.payload.Current.value);\nconst hour = new Date(Date.now() + 3*60*60*1000).getHours();\n// mesai disiysa true degilse false don\nconst mesaiDisi =  (hour < 9 || hour >= 18);\nvar outWorkUsage = false;\nif (mesaiDisi && current > 1){\n    outWorkUsage = true;\n}\nmsg.payload = {\"currentValue\": current,\n    \"outWorkUsage\": outWorkUsage\n}\nmsg.method = \"PATCH\";\nreturn msg",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 460,
+        "wires": [
+            [
+                "63a6916604f38572"
+            ]
+        ]
+    },
+    {
+        "id": "4e3d199931aaae26",
+        "type": "switch",
+        "z": "16aa391b2d5c5413",
+        "name": "filterCurrent",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "Current",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 370,
+        "y": 460,
+        "wires": [
+            [
+                "287bf8a9639b9b77"
+            ]
+        ]
+    },
+    {
+        "id": "59c9f16f4ecbd2f3",
+        "type": "change",
+        "z": "16aa391b2d5c5413",
+        "name": "High",
+        "rules": [
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "PATCH",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload.lowVoltage",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "payload.highVoltage",
+                "pt": "msg",
+                "to": "true",
+                "tot": "bool"
+            },
+            {
+                "t": "move",
+                "p": "payload.Voltage.value",
+                "pt": "msg",
+                "to": "payload.voltageValue",
+                "tot": "msg"
+            },
+            {
+                "t": "delete",
+                "p": "payload.Voltage",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 770,
+        "y": 300,
+        "wires": [
+            [
+                "4fa3242fd6f46fda"
+            ]
+        ]
+    },
+    {
+        "id": "fc552a3a31467eb4",
+        "type": "change",
+        "z": "16aa391b2d5c5413",
+        "name": "Low",
+        "rules": [
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "PATCH",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload.lowVoltage",
+                "pt": "msg",
+                "to": "true",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "payload.highVoltage",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "move",
+                "p": "payload.Voltage.value",
+                "pt": "msg",
+                "to": "payload.voltageValue",
+                "tot": "msg"
+            },
+            {
+                "t": "delete",
+                "p": "payload.Voltage",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 770,
+        "y": 240,
+        "wires": [
+            [
+                "4fa3242fd6f46fda"
+            ]
+        ]
+    },
+    {
+        "id": "57e7603d40147381",
+        "type": "mqtt-broker",
+        "name": "broker",
+        "broker": "172.16.21.127",
+        "port": "8883",
+        "tls": "d71445b1035c3ee7",
+        "clientid": "nodered",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "d71445b1035c3ee7",
+        "type": "tls-config",
+        "name": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "rootCA.crt",
+        "servername": "",
+        "verifyservercert": true,
+        "alpnprotocol": ""
+    }
+]
