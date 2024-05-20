@@ -6,7 +6,6 @@ from requests.exceptions import Timeout
 
 auth_string = 'ditto:ditto'
 encoded_auth = base64.b64encode(auth_string.encode()).decode()
-
 thing_id = "org.acme:innova1-tenant-messages"
 
 
@@ -68,17 +67,22 @@ def process_current(data):
     current_value = float(current_json['Current']['value'])
     value_message = ' '
     out_work_usage = False
-    if timestamp.hour < 9 or timestamp.hour > 18:
-        if current_value > 1:
-            value_message = f"Mesai saatleri dışında ve Akım degeri {current_value}: 1'den büyük."
-            out_work_usage = True
-    else:
-        value_message = f"Mesai saatleri icindeyiz. Akım degeri: {current_value}"
-        out_work_usage = False
 
+    # if timestamp.hour < 9 or timestamp.hour > 18:
+    #
+    # else:
+    #     value_message = f"Mesai saatleri icindeyiz. Akım degeri: {current_value}"
+    #     out_work_usage = False
+
+    if current_value > 1:
+        value_message = f"Mesai saatleri dışında ve Akım degeri {current_value}: 1'den büyük."
+        out_work_usage = True
+    else:
+        value_message =  f"Mesai saatleri dışında ve Akım degeri {current_value}: 1'den küçük."
     values = {
         "currentValue": current_value,
         "outWorkUsage": out_work_usage,
     }
+
     print(value_message)
     send_request(values)
