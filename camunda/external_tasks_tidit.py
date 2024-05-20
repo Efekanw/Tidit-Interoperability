@@ -1,94 +1,84 @@
+import base64
 import json
 from datetime import datetime
 import requests
+from requests.exceptions import Timeout
+
+auth_string = 'ditto:ditto'
+encoded_auth = base64.b64encode(auth_string.encode()).decode()
+
+thing_id = "org.acme:innova1-tenant-messages"
 
 
 def send_request(data):
-    url = 'https://hono.tidit.meetsper.com/telemetry'
+    url = f"https://ditto.tidit.meetsper.com/api/2/things/{thing_id}/features/events/properties"
+
     headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Basic bXktYXV0aC1pZC0xQGlubm92YTEtdGVubmFudDpteS1wYXNzd29yZA=='
+        'Content-Type': 'application/merge-patch+json',
+        'Authorization': f'Basic {encoded_auth}'
     }
-    response = requests.post(url, json=data, headers=headers)
-    print(response.text)
-    return response
-
-
-def create_data_template(path, value):
-    return {
-        "topic": "org.acme/innova1-tennant-messages/things/twin/commands/modify",
-        "headers": {},
-        "path": path,
-        "value": value
-    }
+    try:
+        response = requests.patch(url, json=data, headers=headers, timeout=0.9)
+        print(response.text)
+        return response
+    except Timeout:
+        print("The request timed out.")
+        return None
 
 
 def process_voltage(data):
-    #print(data['data'])
+    print("Voltaj:" + str(data))
     str_data = str(data['data'])
     voltage_str = str_data.split("'")[1]
     voltage_json = json.loads(voltage_str)
     voltage_value = float(voltage_json['Voltage']['value'])
-    print("Voltaj degeri: " + str(voltage_value))
     max_value = 230 * 1.06
     min_value = 230 * 0.94
-
+    message = ' '
     if voltage_value > max_value:
-        message = "Gerilim değeri hedef değerden fazla (%6 fazla)"
-        is_threshold_exceeded = True
-        value_message = "Threshold exceed"
+        message = f"Gerilim değeri {voltage_value}: Hedef değerden fazla (%6 fazla)"
+        low = False
+        high = True
     elif voltage_value < min_value:
-        message = "Gerilim değeri hedef değerden az (%6 az)"
-        is_threshold_exceeded = True
-        value_message = "Threshold exceed"
+        message = f"Gerilim değeri {voltage_value}: Hedef değerden az (%6 az)"
+        low = True
+        high = False
     else:
-        is_threshold_exceeded = False
-        value_message = "Threshold not exceed"
+        message = f"Gerilim değeri {voltage_value}: Hedef değer araliginda"
+        low = False
+        high = False
 
-    data_threshold = create_data_template(
-        "/features/istresholdexceeded/properties/value",
-        is_threshold_exceeded
-    )
-    data_message = create_data_template(
-        "/features/messages/properties/value",
-        value_message
-    )
-
+    values = {
+        "voltageValue": voltage_value,
+        "lowVoltage": low,
+        "highVoltage": high
+    }
     print(message)
-    send_request(data_threshold)
-    send_request(data_message)
+    send_request(values)
 
 
 def process_current(data):
-    #print(data['data'])
+    # print(data['data'])
+    print("Akım: " + str(data))
     str_data = str(data['data'])
     current_str = str_data.split("'")[1]
     current_json = json.loads(current_str)
     current_timestamp = current_json['Current']['timestamp']
     timestamp = datetime.fromisoformat(current_timestamp)
     current_value = float(current_json['Current']['value'])
-
-    print("Zaman: " + str(timestamp))
-    print("Akım degeri: " + str(current_value))
-
+    value_message = ' '
+    out_work_usage = False
     if timestamp.hour < 9 or timestamp.hour > 18:
         if current_value > 1:
-            is_shift_time = False
-            value_message = "Mesai saatleri dışında ve Akım değeri 1'den büyük."
-            print(value_message)
+            value_message = f"Mesai saatleri dışında ve Akım degeri {current_value}: 1'den büyük."
+            out_work_usage = True
     else:
-        is_shift_time = True
-        value_message = "Mesai saatleri"
-        print(value_message)
+        value_message = f"Mesai saatleri icindeyiz. Akım degeri: {current_value}"
+        out_work_usage = False
 
-    data_shift_time = create_data_template(
-        "/features/isshifttime/properties/value",
-        is_shift_time
-    )
-    data_message = create_data_template(
-        "/features/messages/properties/value",
-        value_message
-    )
-
-    send_request(data_shift_time)
-    send_request(data_message)
+    values = {
+        "currentValue": current_value,
+        "outWorkUsage": out_work_usage,
+    }
+    print(value_message)
+    send_request(values)
