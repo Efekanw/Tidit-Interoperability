@@ -1,6 +1,7 @@
 import pycamunda.externaltask
 import json
 
+
 class ExternalTaskException(Exception):
     def __init__(self, *args, message, details='', retry_timeout=15000, **kwargs):
         super().__init__(*args, **kwargs)
@@ -11,7 +12,7 @@ class ExternalTaskException(Exception):
 
 class Worker:
 
-    def __init__(self, url, worker_id, max_tasks=10, async_response_timeout=15000):
+    def __init__(self, url, worker_id, max_tasks=5, async_response_timeout=15000):
         self.fetch_and_lock = pycamunda.externaltask.FetchAndLock(
             url, worker_id, max_tasks, async_response_timeout=async_response_timeout
         )
@@ -24,14 +25,14 @@ class Worker:
             worker_id=worker_id,
             error_message='',
             error_details='',
-            retries=0,
-            retry_timeout=0
+            retries=5,
+            retry_timeout=5000
         )
 
         self.stopped = False
         self.topic_funcs = {}
 
-    def subscribe(self, topic, func, lock_duration=10000, variables=None):
+    def subscribe(self, topic, func, lock_duration=5000, variables=None):
         self.fetch_and_lock.add_topic(topic, lock_duration, variables)
         self.topic_funcs[topic] = func
 

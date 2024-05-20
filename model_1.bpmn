@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0ymw50w" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.16.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.19.0">
+  <bpmn:process id="tidit_id" name="tidit" isExecutable="true" camunda:historyTimeToLive="3">
+    <bpmn:intermediateCatchEvent id="Event_09txu74" name="mqttDataReceived">
+      <bpmn:incoming>Flow_1qmshdd</bpmn:incoming>
+      <bpmn:incoming>Flow_00d3uly</bpmn:incoming>
+      <bpmn:outgoing>Flow_00d3uly</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1qnqsqv</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_126cro3" messageRef="Message_1mb8f2k" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="Event_0yhf7my" name="End Process">
+      <bpmn:incoming>Flow_1vqdl5j</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:startEvent id="tidit" name="Start Process">
+      <bpmn:outgoing>Flow_1qmshdd</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1qmshdd" sourceRef="tidit" targetRef="Event_09txu74" />
+    <bpmn:serviceTask id="Activity_1k6ipzm" name="Check Current" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:exclusive="false" camunda:type="external" camunda:topic="processCurrent">
+      <bpmn:incoming>Flow_11p3x0d</bpmn:incoming>
+      <bpmn:outgoing>Flow_1vqdl5j</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1vqdl5j" sourceRef="Activity_1k6ipzm" targetRef="Event_0yhf7my" />
+    <bpmn:serviceTask id="Activity_1b08jso" name="Check Voltage" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:exclusive="false" camunda:type="external" camunda:topic="processVoltage">
+      <bpmn:incoming>Flow_0y9tsv0</bpmn:incoming>
+      <bpmn:outgoing>Flow_03gct30</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_00d3uly" sourceRef="Event_09txu74" targetRef="Event_09txu74" />
+    <bpmn:sequenceFlow id="Flow_1qnqsqv" sourceRef="Event_09txu74" targetRef="Gateway_1jok96c" />
+    <bpmn:endEvent id="Event_1ojh92a" name="End Process">
+      <bpmn:incoming>Flow_03gct30</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_03gct30" sourceRef="Activity_1b08jso" targetRef="Event_1ojh92a" />
+    <bpmn:exclusiveGateway id="Gateway_1jok96c">
+      <bpmn:incoming>Flow_1qnqsqv</bpmn:incoming>
+      <bpmn:outgoing>Flow_0y9tsv0</bpmn:outgoing>
+      <bpmn:outgoing>Flow_11p3x0d</bpmn:outgoing>
+      <bpmn:outgoing>Flow_03r89hf</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0y9tsv0" sourceRef="Gateway_1jok96c" targetRef="Activity_1b08jso">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="javascript">// Assuming jsonData is the string containing the JSON data
+var jsonVariable = execution.getVariable('data');
+var jsonObject = JSON.parse(jsonVariable );
+// Check if the "Voltage" key exists in the object
+if (jsonObject.hasOwnProperty("Voltage")) {
+    // "Voltage" key exists
+    var voltageValue = jsonObject["Voltage"].value;
+    console.log("Voltage key exists. Value:", voltageValue);
+    true;
+} else {
+    // "Voltage" key does not exist
+    console.log("Voltage key does not exist.");
+    false;
+
+}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_11p3x0d" sourceRef="Gateway_1jok96c" targetRef="Activity_1k6ipzm">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="javascript">var jsonVariable = execution.getVariable('data');
+var jsonObject = JSON.parse(jsonVariable );
+// Check if the "Current" key exists in the object
+if (jsonObject.hasOwnProperty("Current")) {
+    // "Voltage" key exists
+    var currentValue= jsonObject["Current"].value;
+    console.log("Current key exists. Value:", currentValue);
+    true;
+} else {
+    // "Current " key does not exist
+    console.log("Current key does not exist.");
+    false;
+
+}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="Event_1jw1cix" name="End Process">
+      <bpmn:incoming>Flow_03r89hf</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_03r89hf" sourceRef="Gateway_1jok96c" targetRef="Event_1jw1cix">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="javascript">var jsonVariable = execution.getVariable('data');
+var jsonObject = JSON.parse(jsonVariable );
+console.log("BOŞ");
+// Check if the "Current" key exists in the object
+if ((!jsonObject.hasOwnProperty("Current")) &amp;&amp; (!jsonObject.hasOwnProperty("Voltage"))) {
+    console.log("GEÇTİMMMMMMMMM");
+    console.log("END");
+    true;
+} else {
+    console.log("NOT END");
+    false;
+}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+  </bpmn:process>
+  <bpmn:message id="Message_1mb8f2k" name="mqttDataReceived" />
+  <bpmn:message id="Message_3rmupm6" name="Message_3rmupm6" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="tidit_id">
+      <bpmndi:BPMNShape id="Event_09txu74_di" bpmnElement="Event_09txu74" bioc:stroke="#5b176d" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#5b176d">
+        <dc:Bounds x="372" y="169" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="347" y="132" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0yhf7my_di" bpmnElement="Event_0yhf7my" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="1022" y="312" width="36" height="36" />
+        <bpmndi:BPMNLabel color:color="#205022">
+          <dc:Bounds x="1008" y="293" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="tidit" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="179" y="169" width="36" height="36" />
+        <bpmndi:BPMNLabel color:color="#205022">
+          <dc:Bounds x="164" y="212" width="67" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1xhhzvn" bpmnElement="Activity_1k6ipzm" bioc:stroke="#0d4372" bioc:fill="#bbdefb" color:background-color="#bbdefb" color:border-color="#0d4372">
+        <dc:Bounds x="740" y="290" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_022p9rf" bpmnElement="Activity_1b08jso" bioc:stroke="#0d4372" bioc:fill="#bbdefb" color:background-color="#bbdefb" color:border-color="#0d4372">
+        <dc:Bounds x="740" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0mvbc7h" bpmnElement="Event_1ojh92a" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="1022" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel color:color="#205022">
+          <dc:Bounds x="1008" y="148" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1jok96c_di" bpmnElement="Gateway_1jok96c" isMarkerVisible="true" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="495" y="162" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1jw1cix_di" bpmnElement="Event_1jw1cix" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="502" y="492" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="489" y="535" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1qmshdd_di" bpmnElement="Flow_1qmshdd">
+        <di:waypoint x="215" y="187" />
+        <di:waypoint x="372" y="187" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1vqdl5j_di" bpmnElement="Flow_1vqdl5j">
+        <di:waypoint x="840" y="330" />
+        <di:waypoint x="1022" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00d3uly_di" bpmnElement="Flow_00d3uly">
+        <di:waypoint x="390" y="205" />
+        <di:waypoint x="390" y="225" />
+        <di:waypoint x="352" y="225" />
+        <di:waypoint x="352" y="187" />
+        <di:waypoint x="372" y="187" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1qnqsqv_di" bpmnElement="Flow_1qnqsqv">
+        <di:waypoint x="408" y="187" />
+        <di:waypoint x="495" y="187" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03gct30_di" bpmnElement="Flow_03gct30">
+        <di:waypoint x="840" y="120" />
+        <di:waypoint x="1022" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0y9tsv0_di" bpmnElement="Flow_0y9tsv0">
+        <di:waypoint x="520" y="162" />
+        <di:waypoint x="520" y="120" />
+        <di:waypoint x="740" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11p3x0d_di" bpmnElement="Flow_11p3x0d">
+        <di:waypoint x="520" y="212" />
+        <di:waypoint x="520" y="330" />
+        <di:waypoint x="740" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03r89hf_di" bpmnElement="Flow_03r89hf">
+        <di:waypoint x="520" y="212" />
+        <di:waypoint x="520" y="492" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
