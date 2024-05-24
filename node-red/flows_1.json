@@ -1,0 +1,613 @@
+[
+    {
+        "id": "5dc9e6c3f2f1c0de",
+        "type": "tab",
+        "label": "Events",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "457632697a855951",
+        "type": "junction",
+        "z": "5dc9e6c3f2f1c0de",
+        "x": 460,
+        "y": 500,
+        "wires": [
+            [
+                "0060978d97449703"
+            ]
+        ]
+    },
+    {
+        "id": "0060978d97449703",
+        "type": "junction",
+        "z": "5dc9e6c3f2f1c0de",
+        "x": 860,
+        "y": 500,
+        "wires": [
+            [
+                "080aee06735c307c"
+            ]
+        ]
+    },
+    {
+        "id": "5a0a2f893e341911",
+        "type": "switch",
+        "z": "5dc9e6c3f2f1c0de",
+        "name": "Voltage +- %6",
+        "property": "payload.Voltage.value",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lt",
+                "v": "216.2",
+                "vt": "num"
+            },
+            {
+                "t": "gt",
+                "v": "243.8",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 560,
+        "y": 340,
+        "wires": [
+            [
+                "b6c37d4554bed273"
+            ],
+            [
+                "dd5135083fea587e"
+            ],
+            [
+                "05a4196f40db233c"
+            ]
+        ]
+    },
+    {
+        "id": "270493ac712a6986",
+        "type": "mqtt in",
+        "z": "5dc9e6c3f2f1c0de",
+        "d": true,
+        "name": "mqtt-local",
+        "topic": "/sayac",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "57e7603d40147381",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 160,
+        "y": 460,
+        "wires": [
+            [
+                "aa865fc8dc49e45b"
+            ]
+        ]
+    },
+    {
+        "id": "aa865fc8dc49e45b",
+        "type": "switch",
+        "z": "5dc9e6c3f2f1c0de",
+        "name": "Filter",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "Voltage",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "Current",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 310,
+        "y": 460,
+        "wires": [
+            [
+                "5a0a2f893e341911"
+            ],
+            [
+                "b6361bd8ba93a7ce"
+            ]
+        ],
+        "inputLabels": [
+            "Energy Meter Data"
+        ],
+        "outputLabels": [
+            "Voltage",
+            "Current"
+        ]
+    },
+    {
+        "id": "dbef01df0d04ea9a",
+        "type": "http request",
+        "z": "5dc9e6c3f2f1c0de",
+        "name": "Events2Ditto",
+        "method": "use",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://ditto.tidit.meetsper.com/api/2/things/org.acme:innova1-tenant-messages/features/events/properties",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "other",
+                "keyValue": "content-type",
+                "valueType": "other",
+                "valueValue": "application/merge-patch+json"
+            }
+        ],
+        "x": 1450,
+        "y": 480,
+        "wires": [
+            [
+                "052fe16cd958f494"
+            ]
+        ]
+    },
+    {
+        "id": "05a4196f40db233c",
+        "type": "change",
+        "z": "5dc9e6c3f2f1c0de",
+        "name": "Normal",
+        "rules": [
+            {
+                "t": "delete",
+                "p": "payload.Voltage",
+                "pt": "msg"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "PATCH",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload.lowVoltage",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "payload.highVoltage",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 780,
+        "y": 400,
+        "wires": [
+            [
+                "1ade5a1821521b7e"
+            ]
+        ]
+    },
+    {
+        "id": "e63d85d9c0444d21",
+        "type": "debug",
+        "z": "5dc9e6c3f2f1c0de",
+        "name": "debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "statusCode",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1750,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "dd5135083fea587e",
+        "type": "change",
+        "z": "5dc9e6c3f2f1c0de",
+        "name": "High",
+        "rules": [
+            {
+                "t": "delete",
+                "p": "payload.Voltage",
+                "pt": "msg"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "PATCH",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload.lowVoltage",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "payload.highVoltage",
+                "pt": "msg",
+                "to": "true",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 770,
+        "y": 340,
+        "wires": [
+            [
+                "1ade5a1821521b7e"
+            ]
+        ]
+    },
+    {
+        "id": "b6c37d4554bed273",
+        "type": "change",
+        "z": "5dc9e6c3f2f1c0de",
+        "name": "Low",
+        "rules": [
+            {
+                "t": "delete",
+                "p": "payload.Voltage",
+                "pt": "msg"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "PATCH",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload.lowVoltage",
+                "pt": "msg",
+                "to": "true",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "payload.highVoltage",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 770,
+        "y": 280,
+        "wires": [
+            [
+                "1ade5a1821521b7e"
+            ]
+        ]
+    },
+    {
+        "id": "b6361bd8ba93a7ce",
+        "type": "switch",
+        "z": "5dc9e6c3f2f1c0de",
+        "name": "Current >= 1",
+        "property": "payload.Current.value",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "else"
+            },
+            {
+                "t": "gte",
+                "v": "1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 330,
+        "y": 640,
+        "wires": [
+            [
+                "457632697a855951"
+            ],
+            [
+                "5a213fa9f87ca650"
+            ]
+        ],
+        "outputLabels": [
+            "current < 1",
+            "current >= 1"
+        ]
+    },
+    {
+        "id": "1ade5a1821521b7e",
+        "type": "rbe",
+        "z": "5dc9e6c3f2f1c0de",
+        "name": "State Changed",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "payload",
+        "topi": "topic",
+        "x": 1260,
+        "y": 480,
+        "wires": [
+            [
+                "dbef01df0d04ea9a"
+            ]
+        ]
+    },
+    {
+        "id": "5a213fa9f87ca650",
+        "type": "function",
+        "z": "5dc9e6c3f2f1c0de",
+        "name": "get day and hour",
+        "func": "const now = new Date(Date.now());\nmsg.payload = {\n    \"day\": now.getDay(),\n    \"hour\": now.getHours()\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 640,
+        "wires": [
+            [
+                "eaf63745ffa3dcb0",
+                "0c47b013be7f3d8a"
+            ]
+        ]
+    },
+    {
+        "id": "eaf63745ffa3dcb0",
+        "type": "switch",
+        "z": "5dc9e6c3f2f1c0de",
+        "name": "Is weekend",
+        "property": "payload.day",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "btwn",
+                "v": "1",
+                "vt": "num",
+                "v2": "5",
+                "v2t": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 730,
+        "y": 700,
+        "wires": [
+            [
+                "0c47b013be7f3d8a"
+            ],
+            [
+                "65ef023be886733c"
+            ]
+        ],
+        "outputLabels": [
+            "midweek",
+            "weekend"
+        ]
+    },
+    {
+        "id": "0c47b013be7f3d8a",
+        "type": "switch",
+        "z": "5dc9e6c3f2f1c0de",
+        "name": "Is out working hour",
+        "property": "payload.hour",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "regex",
+                "v": "^[0-8]$|1[89]|2\\d",
+                "vt": "str",
+                "case": false
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 810,
+        "y": 600,
+        "wires": [
+            [
+                "080aee06735c307c"
+            ],
+            [
+                "65ef023be886733c"
+            ]
+        ],
+        "outputLabels": [
+            "work hour",
+            "out work hours"
+        ]
+    },
+    {
+        "id": "65ef023be886733c",
+        "type": "change",
+        "z": "5dc9e6c3f2f1c0de",
+        "name": "Alert",
+        "rules": [
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "PATCH",
+                "tot": "str"
+            },
+            {
+                "t": "delete",
+                "p": "payload",
+                "pt": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload.outWorkUsage",
+                "pt": "msg",
+                "to": "true",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1010,
+        "y": 640,
+        "wires": [
+            [
+                "1ade5a1821521b7e"
+            ]
+        ]
+    },
+    {
+        "id": "080aee06735c307c",
+        "type": "change",
+        "z": "5dc9e6c3f2f1c0de",
+        "name": "Normal",
+        "rules": [
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "PATCH",
+                "tot": "str"
+            },
+            {
+                "t": "delete",
+                "p": "payload",
+                "pt": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload.outWorkUsage",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1020,
+        "y": 560,
+        "wires": [
+            [
+                "1ade5a1821521b7e"
+            ]
+        ]
+    },
+    {
+        "id": "052fe16cd958f494",
+        "type": "file",
+        "z": "5dc9e6c3f2f1c0de",
+        "name": "logs",
+        "filename": "/data/logs.txt",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "utf8",
+        "x": 1610,
+        "y": 480,
+        "wires": [
+            [
+                "e63d85d9c0444d21"
+            ]
+        ]
+    },
+    {
+        "id": "57e7603d40147381",
+        "type": "mqtt-broker",
+        "name": "broker",
+        "broker": "95.0.189.144",
+        "port": "8883",
+        "tls": "d71445b1035c3ee7",
+        "clientid": "nodered",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "d71445b1035c3ee7",
+        "type": "tls-config",
+        "name": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "rootCA.crt",
+        "servername": "",
+        "verifyservercert": true,
+        "alpnprotocol": ""
+    }
+]
