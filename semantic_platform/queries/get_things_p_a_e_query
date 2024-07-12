@@ -1,0 +1,23 @@
+PREFIX td: <https://www.w3.org/2019/wot/td#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX wot: <https://www.w3.org/2019/wot/td#>
+PREFIX saref: <https://w3id.org/saref#>
+
+SELECT DISTINCT ?thing ?title
+WHERE {
+  ?thing rdf:type wot:Thing .
+  {
+    ?thing td:hasActionAffordance ?action .
+    ?action td:title ?title .
+  }
+  UNION
+  {
+    ?thing td:hasPropertyAffordance ?property .
+    ?property td:title ?title .
+  }
+  UNION
+  {
+    ?thing td:hasEventAffordance ?event .
+    ?event td:title ?title .
+  }
+}

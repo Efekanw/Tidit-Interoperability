@@ -1,0 +1,2 @@
+<http://127.0.0.1:5001>
+<https://ditto:ditto@ditto.tidit.meetsper.com/api/2/things/org.acme%3Ainnova1-tenant-messages/features>
