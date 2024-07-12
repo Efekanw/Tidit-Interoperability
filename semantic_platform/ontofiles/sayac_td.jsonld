@@ -1,0 +1,52 @@
+{
+  "@context": [
+    "https://www.w3.org/2022/wot/td/v1.1",
+    {
+    "core": "http://iot.linkeddata.es/def/core#",
+    "saref": "https://w3id.org/saref#"
+    }
+  ],
+  "@id": "https://ditto:ditto@ditto.tidit.meetsper.com/api/2/things/org.acme%3Ainnova1-tenant-messages/features",
+  "@type": ["saref:Energymeter", "td:Thing"],
+  "title": "Sayac",
+  "description": "Innova sayac",
+  "properties": {
+    "Voltage":{
+    "@type": "voltageProperty",
+    "type": "float",
+    "title": "Voltage",
+    "description": "Voltage value",
+    "links": [{"href": "/events/properties/voltageValue"}]
+    },
+    "Current":{
+    "@type": "currentProperty",
+    "type": "float",
+    "title": "Current",
+    "description": "Current value",
+    "links": [{"href": "/events/properties/currentValue"}]
+    }
+  },
+  "events": {
+    "highVoltage": {
+      "title": "highVoltage",
+      "@type": "highVoltageEvent",
+      "type": "boolean",
+      "description": "Yüksek voltaj sayac",
+      "links": [{"href": "/events/properties/highVoltage"}]
+    },
+    "lowVoltage": {
+      "title": "lowVoltage",
+      "@type": "lowVoltageEvent",
+      "type": "boolean",
+      "description": "Düşük voltaj sayac",
+      "links": [{"href": "/events/properties/lowVoltage"}]
+    },
+    "outWorkUsage": {
+      "title": "outWorkUsage",
+      "@type": "outWorkUsageEvent",
+      "type": "boolean",
+      "description": "Mesai saati dışında kullanım",
+      "links": [{"href": "/events/properties/outWorkUsage"}]
+    }
+  }
+}

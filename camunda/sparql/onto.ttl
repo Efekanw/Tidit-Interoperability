@@ -1,34 +1,22 @@
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix tidit: <https://arge.innova.com.tr/Tidit.owl#> .
-@prefix wot: <https://arge.innova.com.tr/wot.owl#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix ssn: <http://www.w3.org/ns/ssn/>.
+@prefix core: <http://iot.linkeddata.es/def/core#>.
 
-# Ontology
-<https://arge.innova.com.tr/Tidit.owl>
-    rdf:type owl:Ontology ;
-    owl:imports <http://purl.obolibrary.org/obo/bfo/2014-05-03/bfo.owl> ;
-    owl:imports <https://arge.innova.com.tr/wot.owl> ;
-    owl:imports <https://arge.innova.com.tr/wot_mappings.owl#> .
+# Device sınıfını tanımlayan örnek bir URI
+core:Device a rdfs:Class.
 
-# Object Properties
-tidit:describe rdf:type owl:ObjectProperty ;
-    rdfs:domain wot:Thing ;
-    rdfs:range tidit:ThingDescription .
+# Service sınıfını tanımlayan örnek bir URI
+core:Service a rdfs:Class.
 
-# Data properties
-tidit:objectName rdf:type owl:DatatypeProperty ;
-    rdfs:domain tidit:ThingDescription ;
-    rdfs:range xsd:string .
+# Property sınıfını tanımlayan örnek bir URI
+ssn:Property a rdfs:Class.
 
-tidit:detectionTime rdf:type owl:DatatypeProperty ;
-    rdfs:domain tidit:ThingDescription ;
-    rdfs:range xsd:dateTime .
+# Device sınıfının bir alt sınıfı olarak tanımlanan örnek bir URI
+core:SomeDeviceSubclass rdfs:subClassOf core:Device.
 
-tidit:confidence rdf:type owl:DatatypeProperty ;
-    rdfs:domain tidit:ThingDescription ;
-    rdfs:range xsd:float .
+# Service sınıfının bir alt sınıfı olarak tanımlanan örnek bir URI
+core:SomeServiceSubclass rdfs:subClassOf core:Service.
 
-# Classes
-tidit:ThingDescription rdf:type owl:Class .
+# Bir örnek özellik
+<http://example.org/properties/prop1> a ssn:Property.
+

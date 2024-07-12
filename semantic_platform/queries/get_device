@@ -1,0 +1,12 @@
+PREFIX wo: <http://purl.org/ontology/wo/>
+PREFIX td: <https://www.w3.org/2019/wot/td#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX wot: <https://www.w3.org/2019/wot/td#>
+PREFIX core: <http://iot.linkeddata.es/def/core#>
+PREFIX adapters: <http://iot.linkeddata.es/def/adapters#>
+PREFIX saref: <https://w3id.org/saref#>
+
+SELECT ?thing
+WHERE {
+  ?thing rdf:type saref:Energymeter .
+}

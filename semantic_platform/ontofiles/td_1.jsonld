@@ -1,0 +1,86 @@
+{
+  "@context": [
+    "https://www.w3.org/2022/wot/td/v1.1",
+    {
+    "core": "http://iot.linkeddata.es/def/core#",
+    "adapters": "http://iot.linkeddata.es/def/adapters#"
+    }
+  ],
+  "@id": "http://127.0.0.1:5001",
+  "@type": ["adapters:Lightbulb", "td:Thing"],
+  "title": "My Lamp",
+  "description": "A web connected lamp",
+  "properties": {
+    "on": {
+      "@type": "OnOffProperty",
+      "type": "boolean",
+      "title": "On/Off",
+      "description": "Whether the lamp is turned on",
+      "links": [{"href": "/on"}]
+    },
+    "brightness" : {
+      "@type": "BrightnessProperty",
+      "type": "integer",
+      "title": "Brightness",
+      "description": "The level of light from 0-100",
+      "minimum" : 0,
+      "maximum" : 100,
+      "links": [{"href": "/brightness"}]
+    }
+  },
+  "actions": {
+    "fade": {
+      "@type": "FadeAction",
+      "title": "Fade",
+      "description": "Fade the lamp to a given level",
+      "input": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "duration": {
+            "type": "integer",
+            "minimum": 0,
+            "unit": "milliseconds"
+          }
+        }
+      },
+      "links": [{"href": "/fade"}]
+    }
+  },
+  "events": {
+    "overheated": {
+      "title": "Overheated",
+      "@type": "OverheatedEvent",
+      "type": "boolean",
+      "description": "The lamp has exceeded its safe operating temperature",
+      "links": [{"href": "/overheated"}]
+    }
+  },
+  "links": [
+    {
+      "rel": "properties",
+      "href": "/things/lamp/properties"
+    },
+    {
+      "rel": "actions",
+      "href": "/things/lamp/actions"
+    },
+    {
+      "rel": "events",
+      "href": "/things/lamp/events"
+    },
+    {
+      "rel": "alternate",
+      "href": "wss://mywebthingserver.com/things/lamp"
+    },
+    {
+      "rel": "alternate",
+      "mediaType": "text/html",
+      "href": "/things/lamp"
+    }
+  ]
+}

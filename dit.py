@@ -8,12 +8,13 @@ username = "admin"
 password = "VLmJN7HfFDAOrNI"
 
 
-def listen_to_event_stream(url):
+def listen_ditto(mything):
 
     auth = HTTPBasicAuth("ditto", "ditto")
 
     #Ditto Thing özellik tanımına istek
-    feature_url = ditto_url + '/things/sensor:4/features'
+
+    feature_url = ditto_url + '/things/' + mything + '/features'
     response = requests.get(feature_url, auth=auth)
     feature_json = json.loads(response.text)
     for key in feature_json:
@@ -27,4 +28,5 @@ def listen_to_event_stream(url):
 
 
 if __name__ == "__main__":
-    listen_to_event_stream(ditto_url)
+    thing = "sensor:4"
+    listen_ditto(thing)

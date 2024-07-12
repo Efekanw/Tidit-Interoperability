@@ -1,0 +1,114 @@
+{
+  "@context": [
+    "https://www.w3.org/2022/wot/td/v1.1",
+    {
+      "core": "http://iot.linkeddata.es/def/core#",
+      "adapters": "http://iot.linkeddata.es/def/adapters#",
+      "om": "http://www.ontology-of-units-of-measure.org/resource/om-2/"
+    }
+  ],
+  "@id": "http://127.0.0.1:5002",
+  "@type": ["MillingMachine", "td:Thing"],
+  "title": "Milling Machine",
+  "modelNumber": "000921424",
+  "serialNumber": "061981035",
+  "materialType": "Steel",
+  "motorPower": "5 kW",
+  "version": {
+    "model": "1.0.0"
+  },
+  "properties": {
+    "weight": {
+      "@type": "om:Measure",
+      "title": "Weight",
+      "rdfs:label": "kilogram",
+      "om:symbol": "kg",
+      "om:hasUnit": "om:Kilogram",
+      "om:hasNumericalValue": 70
+    },
+    "vibrationLevel": {
+      "@type": "om:Measure",
+      "title": "Vibration Level",
+      "om:hasUnit": {
+        "@id": "om:MeterPerSecondSquared"
+      },
+      "om:hasNumericalValue": 0.5
+    },
+    "motorTemperature": {
+      "@type": "om:Measure",
+      "title": "Motor Temperature",
+      "om:hasUnit": {
+        "@id": "om:CelsiusDegree"
+      },
+      "om:hasNumericalValue": 70
+    },
+    "motorPower": {
+      "@type": "om:Measure",
+      "title": "Motor Power",
+      "om:hasUnit": "om:Kilowatt",
+      "om:hasNumericalValue": 0.5
+    }
+  },
+  "actions": {
+    "startMachine": {
+      "@type": "startMachine",
+      "title": "Start Machine",
+      "description": "Start Machine"
+    },
+    "startCutting": {
+      "@type": "startCutting",
+      "title": "Start Cutting",
+      "description": "Start Cutting"
+    },
+    "setSpeed": {
+      "@type": "setSpeed",
+      "title": "Set Speed",
+      "om:hasValue": {
+        "@type": "om:Measure",
+        "om:hasUnit": "om:RevolutionsPerMinute",
+        "om:hasNumericalValue": 5000
+      },
+      "links": [{"href": "/actions/properties/setSpeed"}]
+    },
+    "setDepth": {
+      "@type": "setDepth",
+      "title": "Set Depth",
+      "om:hasValue": {
+        "@type": "om:Measure",
+        "om:hasUnit": "om:Millimetre",
+        "om:hasNumericalValue": 5
+      },
+      "links": [{"href": "/actions/properties/setDepth"}]
+    }
+  },
+  "events": {
+    "machineStarted": {
+      "title": "Machine Started",
+      "@type": "machineStartEvent",
+      "type": "boolean",
+      "description": "Makine Çalıştırıldı",
+      "links": [{"href": "/events/properties/machineStart"}]
+    },
+    "cuttingStarted": {
+      "title": "Cutting Started",
+      "@type": "cuttingStartedEvent",
+      "type": "boolean",
+      "description": "Kesin Başladı",
+      "links": [{"href": "/events/properties/cuttingStarted"}]
+    },
+    "excessiveVibration": {
+      "title": "Excessive Vibration",
+      "@type": "excessiveVibrationEvent",
+      "type": "boolean",
+      "description": "Aşırı Titreşim Hatası",
+      "links": [{"href": "/events/properties/excessiveVibration"}]
+    },
+    "overHeating": {
+      "title": "Overheating",
+      "@type": "overHeatingEvent",
+      "type": "boolean",
+      "description": "Aşırı Sıcaklık",
+      "links": [{"href": "/events/properties/overHeating"}]
+    }
+  }
+}
