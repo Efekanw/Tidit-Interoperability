@@ -2,28 +2,27 @@
   "@context": [
     "https://www.w3.org/2022/wot/td/v1.1",
     {
-    "core": "http://iot.linkeddata.es/def/core#",
     "saref": "https://w3id.org/saref#"
     }
   ],
-  "@id": "https://ditto:ditto@ditto.tidit.meetsper.com/api/2/things/org.acme%3Ainnova1-tenant-messages/features",
+  "@id": "http://127.0.0.1:5001",
   "@type": ["saref:Energymeter", "td:Thing"],
   "title": "Sayac",
   "description": "Innova sayac",
   "properties": {
     "Voltage":{
-    "@type": "voltageProperty",
+    "@id":"http://127.0.0.1:5001/voltage",
     "type": "float",
     "title": "Voltage",
     "description": "Voltage value",
-    "links": [{"href": "/events/properties/voltageValue"}]
+    "links": [{"href": "/voltage"}]
     },
     "Current":{
-    "@type": "currentProperty",
-    "type": "float",
+    "@id":"http://127.0.0.1:5001/current",
+    "type":"float",
     "title": "Current",
     "description": "Current value",
-    "links": [{"href": "/events/properties/currentValue"}]
+    "links": [{"href": "/current"}]
     }
   },
   "events": {

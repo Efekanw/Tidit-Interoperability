@@ -5,12 +5,13 @@ from flask import Flask, request, jsonify
 from flask_restx import Api, Resource, fields
 from rdflib import Graph, plugin
 from SPARQLWrapper import SPARQLWrapper, JSON, POST, SPARQLExceptions
+from convert_triple import insert_into_fuseki, convert
 
 app = Flask(__name__)
 api = Api(app, version='1.0', title='Tidit Interoperability API', description='A simple API to interact with a triple store')
 ns = api.namespace('tidit interoperability', description='Operations related to triple store')
 
-endpoint_url = 'http://localhost:3030/tidit/'
+endpoint_url = 'http://localhost:3030/p/'
 
 url_query = endpoint_url + 'sparql'
 url_update = endpoint_url + 'update'
@@ -41,6 +42,9 @@ results = {
     'Frequency': ('', '')
 }
 
+username = 'admin'
+password = 'VLmJN7HfFDAOrNI'
+
 
 @ns.route('/register')
 class LoadJSONLD(Resource):
@@ -51,7 +55,7 @@ class LoadJSONLD(Resource):
         try:
             sparql = SPARQLWrapper(url_update)
             print(url_update)
-            sparql.setCredentials('admin', 'VLmJN7HfFDAOrNI')
+            sparql.setCredentials(username, password)
 
             jsonld_content = json.loads(uploaded_file.read())
             print(jsonld_content)
@@ -91,7 +95,7 @@ class DiscoverTripleStore(Resource):
             print(query)
 
             sparql = SPARQLWrapper(url_query)
-            sparql.setCredentials('admin', 'VLmJN7HfFDAOrNI')
+            sparql.setCredentials(username, password)
 
             sparql.setMethod("POST")
             sparql.setQuery(query)
@@ -120,52 +124,42 @@ class GetData(Resource):
             data = api.payload
             thing_id = data['thingid']
             links = query_by_thing_id(thing_id)
+            print(links)
             cleaned_thing_id = thing_id.strip('<>').strip()
-            titles = []
-            link_list = []
+            result_dict = {}
             for entry in links['results']['bindings']:
-                titles.append(entry['title']['value'])
-                link_list.append(entry['linkValue']['value'])
+                datatype = entry['type']['value'].split("#")[-1]
+                print(datatype)
+                result_dict[entry['title']['value']] = {
+                    'link': entry['linkValue']['value'],
+                    'property': entry['property']['value'],
+                    'type': datatype,
+                    'observation_counter': 0
+                }
             results = {}
-            for link in link_list:
-                request_link = cleaned_thing_id + link
+            for key in result_dict:
+                link = cleaned_thing_id + result_dict[key]['link']
+                request_link = link
                 response = requests.get(request_link, headers={'Accept': 'application/json'})
+                response_data = {}
                 if response.status_code == 200:
-                    results[link] = response.json()
-            print(results)
+                    response_data = response.json()
+                result_dict[key]['data'] = response_data["data"]
+                result_dict[key]['time'] = response_data["time"]
+            for key in result_dict:
+                print(result_dict[key]["type"])
+
+                graph = convert(cleaned_thing_id, result_dict[key]['property'], result_dict[key]['data'], result_dict[key]['type'],
+                                result_dict[key]['time'], result_dict[key]['observation_counter'], 'p')
+                print(graph)
+                result_dict[key]['observation_counter'] += 1
+                insert_into_fuseki(graph, endpoint_url, username, password)
+
+            print(result_dict)
+
             return results, 200
         except Exception as e:
             return {"error": str(e)}, 500
-
-
-def print_table(payload):
-    global i
-    i += 1
-    key = list(payload.keys())[0]
-    value = payload[key]['value']
-    timestamp = payload[key]['timestamp']
-    results[key] = (value, timestamp)
-    if i%7 == 0:
-        os.system('cls' if os.name == 'nt' else 'clear')
-        print('-'*60)
-        print(f'| {"Measurment":<20} | {"Value":<10} | {"Time":<20} |')
-        print('='*60)
-        for key, val in results.items():
-            print(f'| {key:<20} | {val[0]:<10} | {val[1]:<20} |')
-            print('-'*60)
-
-
-def on_connect(client, userdata, flags, rc):
-    if rc == 0:
-        print("Connected to MQTT broker")
-    else:
-        print("Connection failed")
-
-
-def on_message(client, userdata, message):
-    payload = str(message.payload.decode('utf-8'))
-    payload = json.loads(payload)
-    print_table(payload)
 
 
 def query_by_thing_id(thing_id):
@@ -175,40 +169,26 @@ def query_by_thing_id(thing_id):
     PREFIX wot: <https://www.w3.org/2019/wot/td#>
     PREFIX hypermedia: <https://www.w3.org/2019/wot/hypermedia#>
 
-    SELECT DISTINCT ?title ?linkValue
+    SELECT ?thing ?property ?title ?type ?linkValue
     WHERE {
         id rdf:type wot:Thing ;
-        {
-          ?thing td:hasActionAffordance ?action .
-          ?action td:title ?title ;
-                  td:hasLink ?link .
-          ?link hypermedia:hasTarget ?linkValue .
-        }
-      UNION
         {
           ?thing td:hasPropertyAffordance ?property .
           ?property td:title ?title ;
                     td:hasLink ?link .
           ?link hypermedia:hasTarget ?linkValue .
-        }
-      UNION
-        {
-          ?thing td:hasEventAffordance ?event .
-          ?event td:title ?title ;
-                 td:hasLink ?link .
-          ?link hypermedia:hasTarget ?linkValue .
+          ?property rdf:type ?type .
         }
     }
-
     """
     query = query.replace("id", thing_id)
     print(query)
     sparql = SPARQLWrapper(url_query)
-    sparql.setCredentials('admin', 'VLmJN7HfFDAOrNI')
+    sparql.setCredentials(username, password)
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
-
+    print(results)
     return results
 
 
