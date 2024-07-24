@@ -1,0 +1,11 @@
+@prefix sosa1: <https://www.w3.org/ns/sosa#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://127.0.0.1:5001/voltage/Observation/346344> a sosa1:Observation ;
+    sosa1:hasSimpleResult "23.5"^^xsd:float ;
+    sosa1:madeBySensor <http://127.0.0.1:5001> ;
+    sosa1:observedProperty <http://127.0.0.1:5001/voltage> ;
+    sosa1:resultTime "2017-06-06T12:36:12+00:00"^^xsd:dateTime .
+
+<http://127.0.0.1:5001> a sosa1:Sensor ;
+    sosa1:observes <http://127.0.0.1:5001/voltage> .

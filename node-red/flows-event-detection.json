@@ -1,0 +1,560 @@
+[
+    {
+        "id": "1591b95f5a67df18",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "d0dfbec79fe7aaf7",
+        "type": "tab",
+        "label": "SPARQL Query Flow",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "db079fae6025e22f",
+        "type": "subflow",
+        "name": "Run SPARQL Query",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 200,
+                "y": 340,
+                "wires": [
+                    {
+                        "id": "11081d131b0c0885"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 1240,
+                "y": 340,
+                "wires": [
+                    {
+                        "id": "2892ad2081cbec94",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "11081d131b0c0885",
+        "type": "function",
+        "z": "db079fae6025e22f",
+        "name": "Format Query",
+        "func": "msg.payload = `query=${encodeURIComponent(msg.sparqlQuery)}`;\nmsg.headers = { 'Content-Type': 'application/x-www-form-urlencoded' };\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 340,
+        "wires": [
+            [
+                "f1321bd40eee9198"
+            ]
+        ]
+    },
+    {
+        "id": "f1321bd40eee9198",
+        "type": "http request",
+        "z": "db079fae6025e22f",
+        "name": "POST SPARQL Query",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://localhost:3030/p/sparql",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 640,
+        "y": 340,
+        "wires": [
+            [
+                "1ac0e746fc7275f3"
+            ]
+        ]
+    },
+    {
+        "id": "1ac0e746fc7275f3",
+        "type": "xml",
+        "z": "db079fae6025e22f",
+        "name": "Parse XML",
+        "property": "payload",
+        "attr": "",
+        "chr": "",
+        "x": 850,
+        "y": 340,
+        "wires": [
+            [
+                "2892ad2081cbec94"
+            ]
+        ]
+    },
+    {
+        "id": "2892ad2081cbec94",
+        "type": "function",
+        "z": "db079fae6025e22f",
+        "name": "Extract Value",
+        "func": "try {\n    msg.payload.value = msg.payload['sparql']['results'][0]['result'][0]['binding'][0]['literal'][0]['_'];\n    msg.payload.time = msg.payload['sparql']['results'][0]['result'][0]['binding'][1]['literal'][0]['_'];\n    msg.payload.observe_id = msg.payload['sparql']['results'][0]['result'][0]['binding'][2]['uri'][0];\n\n} catch (e) {\n    node.error('Failed to extract value', msg);\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1030,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9ee4fb74866251b0",
+        "type": "sparql",
+        "z": "1591b95f5a67df18",
+        "name": "a",
+        "prefix": "http://localhost:3030/p/sparql",
+        "func": "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nPREFIX sosa: <https://www.w3.org/ns/sosa#>\n\nSELECT ?result\nWHERE {\n    ?observation a sosa:Observation ;\n                 sosa:madeBySensor <http://127.0.0.1:5001> ;\n                 sosa:hasSimpleResult ?result ;\n                 sosa:resultTime ?resultTime .\n}\nORDER BY DESC(?resultTime)\nLIMIT 1",
+        "outputs": 1,
+        "x": 310,
+        "y": 100,
+        "wires": [
+            [
+                "6a9f6acb79bf4f95"
+            ]
+        ]
+    },
+    {
+        "id": "6a9f6acb79bf4f95",
+        "type": "debug",
+        "z": "1591b95f5a67df18",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 690,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "c0eac6aabbe3fa52",
+        "type": "inject",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 120,
+        "wires": [
+            [
+                "9ee4fb74866251b0"
+            ]
+        ]
+    },
+    {
+        "id": "2c010a4aa8bd846d",
+        "type": "inject",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 170,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cc37d6d7426af337",
+        "type": "subflow:db079fae6025e22f",
+        "z": "d0dfbec79fe7aaf7",
+        "name": "",
+        "x": 690,
+        "y": 440,
+        "wires": [
+            [
+                "5f0ed967dfbe3358"
+            ]
+        ]
+    },
+    {
+        "id": "9978eacb24479518",
+        "type": "inject",
+        "z": "d0dfbec79fe7aaf7",
+        "name": "Inject",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "5",
+        "topic": "",
+        "x": 1350,
+        "y": 140,
+        "wires": [
+            [
+                "0de33689afb0b964"
+            ]
+        ]
+    },
+    {
+        "id": "0de33689afb0b964",
+        "type": "template",
+        "z": "d0dfbec79fe7aaf7",
+        "name": "SPARQL Query",
+        "field": "sparqlQuery",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nPREFIX sosa: <https://www.w3.org/ns/sosa#>\n\nSELECT ?result ?resultTime ?observation\nWHERE {\n  ?observation a sosa:Observation ;\n         sosa:madeBySensor <http://127.0.0.1:5001> ;\n         sosa:hasSimpleResult ?result ;\n         sosa:resultTime ?resultTime .\n}\nORDER BY DESC(?resultTime)\nLIMIT 1",
+        "output": "str",
+        "x": 440,
+        "y": 440,
+        "wires": [
+            [
+                "cc37d6d7426af337"
+            ]
+        ]
+    },
+    {
+        "id": "5f0ed967dfbe3358",
+        "type": "switch",
+        "z": "d0dfbec79fe7aaf7",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lt",
+                "v": "23",
+                "vt": "str"
+            },
+            {
+                "t": "gt",
+                "v": "23",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 950,
+        "y": 440,
+        "wires": [
+            [
+                "ab02a3508dbd805b"
+            ],
+            [
+                "afdb180f4ac370fb"
+            ]
+        ]
+    },
+    {
+        "id": "5f2e5bbf48cf74eb",
+        "type": "template",
+        "z": "d0dfbec79fe7aaf7",
+        "name": "Insert SPARQL Query",
+        "field": "sparqlQuery",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "PREFIX sosa1: <https://www.w3.org/ns/sosa#> \nPREFIX ssn: <http://www.w3.org/ns/ssn/> \nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n\nINSERT DATA {\n  <{{{payload.observe_id}}}> a sosa1:Observation ;\n      ssn:detects <http://127.0.0.1:5001/voltage> ;\n      sosa1:hasSimpleResult \"{{payload.bool}}\"^^xsd:boolean ;\n      sosa1:madeBySensor <http://127.0.0.1:5001> ;\n      sosa1:resultTime \"{{payload.time}}\"^^xsd:dateTime .\n\n  <http://127.0.0.1:5001> a sosa1:Sensor ;\n      sosa1:observes <http://127.0.0.1:5001/voltage> .\n}\n",
+        "output": "str",
+        "x": 1340,
+        "y": 420,
+        "wires": [
+            [
+                "3763e85ce0d04476"
+            ]
+        ]
+    },
+    {
+        "id": "ab02a3508dbd805b",
+        "type": "change",
+        "z": "d0dfbec79fe7aaf7",
+        "name": "Set True",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.bool",
+                "pt": "msg",
+                "to": "true",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "payload.time",
+                "pt": "msg",
+                "to": "iso",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1100,
+        "y": 360,
+        "wires": [
+            [
+                "5f2e5bbf48cf74eb"
+            ]
+        ]
+    },
+    {
+        "id": "afdb180f4ac370fb",
+        "type": "change",
+        "z": "d0dfbec79fe7aaf7",
+        "name": "Set False",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.bool",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "payload.time",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            },
+            {
+                "t": "change",
+                "p": "payload.observe_id",
+                "pt": "msg",
+                "from": "&#x2F;",
+                "fromt": "str",
+                "to": "/",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1100,
+        "y": 480,
+        "wires": [
+            [
+                "5f2e5bbf48cf74eb"
+            ]
+        ]
+    },
+    {
+        "id": "3763e85ce0d04476",
+        "type": "function",
+        "z": "d0dfbec79fe7aaf7",
+        "name": "Format Query",
+        "func": "msg.payload = (msg.sparqlQuery);\nmsg.headers = { 'Content-Type': 'application/sparql-update' };\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1560,
+        "y": 420,
+        "wires": [
+            [
+                "fdab0a2a2dd49558"
+            ]
+        ]
+    },
+    {
+        "id": "fdab0a2a2dd49558",
+        "type": "http request",
+        "z": "d0dfbec79fe7aaf7",
+        "name": "POST SPARQL Query",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://localhost:3030/p/update",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 1780,
+        "y": 420,
+        "wires": [
+            [
+                "831a255294ad1077"
+            ]
+        ]
+    },
+    {
+        "id": "831a255294ad1077",
+        "type": "switch",
+        "z": "d0dfbec79fe7aaf7",
+        "name": "Check Status Code",
+        "property": "statusCode",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "204",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1990,
+        "y": 420,
+        "wires": [
+            [
+                "47d3248afca5c08e"
+            ],
+            [
+                "2f9a0357541b2e60"
+            ]
+        ]
+    },
+    {
+        "id": "47d3248afca5c08e",
+        "type": "change",
+        "z": "d0dfbec79fe7aaf7",
+        "name": "Set Success Message",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"message\": \"HTTP POST request successful!\"}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2220,
+        "y": 340,
+        "wires": [
+            [
+                "bb8ecc384642ecba"
+            ]
+        ]
+    },
+    {
+        "id": "2f9a0357541b2e60",
+        "type": "change",
+        "z": "d0dfbec79fe7aaf7",
+        "name": "Set Failure Message",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"message\": \"HTTP POST request failed!\", \"status\": \"{{statusCode}}\"}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2220,
+        "y": 500,
+        "wires": [
+            [
+                "1959ed45731f40b3"
+            ]
+        ]
+    },
+    {
+        "id": "bb8ecc384642ecba",
+        "type": "debug",
+        "z": "d0dfbec79fe7aaf7",
+        "name": "Insert Event Successful!",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2490,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "1959ed45731f40b3",
+        "type": "debug",
+        "z": "d0dfbec79fe7aaf7",
+        "name": "Insert Event Failed!",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2470,
+        "y": 500,
+        "wires": []
+    }
+]
