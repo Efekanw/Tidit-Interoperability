@@ -10,7 +10,7 @@
   "Voltage": {
     "@type": "om2:quantity",
     "om2:hasValue": {
-      "@value": "232.36",
+      "@value": "232.35",
       "@type": "xsd:decimal"
     },
     "om2:Unit": "om2:volt"

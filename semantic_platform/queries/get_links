@@ -6,7 +6,7 @@ PREFIX core: <http://iot.linkeddata.es/def/core#>
 PREFIX adapters: <http://iot.linkeddata.es/def/adapters#>
 PREFIX saref: <https://w3id.org/saref#>
 
-SELECT DISTINCT ?thing ?title ?linkValue
+SELECT DISTINCT ?thing ?property ?type ?linkValue ?title
 WHERE {
   ?thing rdf:type saref:Energymeter .
   {
@@ -21,6 +21,7 @@ WHERE {
     ?property td:title ?title ;
               td:hasLink ?link .
     ?link hypermedia:hasTarget ?linkValue .
+    ?property rdf:type ?type .
   }
   UNION
   {
