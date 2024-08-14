@@ -1,0 +1,13 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/td",
+    {
+    "wd": "https://arge.innova.com.tr/wisenet.ttl#",
+    "sosa": "https://www.w3.org/ns/sosa#"
+    }
+  ],
+  "@id": "room/1",
+  "@type": "wd:Space",
+  "description": "A space containing sensors",
+  "location": "Building 1, Floor 2"
+}

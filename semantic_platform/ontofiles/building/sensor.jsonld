@@ -1,0 +1,42 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/td",
+    {
+    "wd": "https://arge.innova.com.tr/wisenet.ttl#",
+    "sosa": "https://www.w3.org/ns/sosa#"
+    }
+  ],
+  "@id": "sensor/1",
+  "@type": "wd:Sensor",
+  "title": "Sensor",
+  "description": "A sensor",
+  "wd:is_hosted_by": {
+    "@type": "wd:Space",
+    "@id": "room/1",
+    "description": "Space containt the sensor"
+  },
+  "properties": {
+    "sicaklik":{
+    "@type": "sosa:ObservableProperty",
+    "@id": "sensor/1/sicaklik",
+    "description": "sicaklik",
+    "links": [{"href": "/sicaklik"}]
+    },
+    "nem":{
+    "@type": "sosa:ObservableProperty",
+    "@id": "sensor/1/nem",
+    "description": "nem",
+    "links": [{"href": "/nem"}]
+    }
+  },
+  "events": {
+    "hareketvarmi": {
+      "@id": "sensor/1/hareketvarmi",
+      "title": "hareketvarmi",
+      "@type": "hareketvarmi",
+      "type": "boolean",
+      "description": "Hareket var",
+      "links": [{"href": "/events/hareketvarmi"}]
+    }
+  }
+}
