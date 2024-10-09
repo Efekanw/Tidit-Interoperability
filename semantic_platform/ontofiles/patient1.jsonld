@@ -1,0 +1,71 @@
+{
+  "@context": {
+    "sosa": "http://www.w3.org/ns/sosa#",
+    "snomed": "http://purl.bioontology.org/ontology/SNOMEDCT/",
+    "fhir": "https://www.hl7.org/fhir/",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@id": "http://example.org/patient/12345",
+  "@type": "fhir:Patient",
+  "fhir:identifier": [
+    {
+      "fhir:system": "http://hospital.example.org/patients",
+      "fhir:value": "patient-id-12345"
+    }
+  ],
+  "fhir:name": [
+    {
+      "fhir:use": "official",
+      "fhir:text": "John Doe"
+    }
+  ],
+  "fhir:gender": "male",
+  "fhir:birthDate": "1980-01-01",
+  "fhir:address": [
+    {
+      "fhir:line": ["123 Main St"],
+      "fhir:city": "Anytown",
+      "fhir:state": "CA",
+      "fhir:postalCode": "12345",
+      "fhir:country": "USA"
+    }
+  ],
+  "fhir:contact": [
+    {
+      "fhir:relationship": [
+        {
+          "fhir:code": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                "code": "NOK",
+                "display": "Next of Kin"
+              }
+            ]
+          }
+        }
+      ],
+      "fhir:name": {
+        "fhir:text": "Jane Doe"
+      },
+      "fhir:telecom": [
+        {
+          "fhir:system": "phone",
+          "fhir:value": "+1-555-123-4567"
+        }
+      ]
+    }
+  ],
+  "health:mentalHealthStatus": "Stable",
+  "health:physicalHealthStatus": "Moderate physical activity, no chronic conditions.",
+  "sosa:observedProperty": {
+    "@type": "sosa:Observation",
+    "sosa:hasFeatureOfInterest": {
+      "@type": "sosa:ObservedProperty",
+      "snomed:code": "116154003",
+      "snomed:display": "Patient Needs"
+    },
+    "sosa:resultTime": "2024-10-09T00:00:00Z"
+  }
+}
