@@ -31,8 +31,7 @@
       "fhir:country": "USA"
     }
   ],
-  "properties":{
-    "health:mentalHealthStatus": "Stable",
+  "health:mentalHealthStatus": "Stable",
   "health:physicalHealthStatus": "Moderate physical activity, no chronic conditions.",
   "sosa:observedProperty": {
     "@type": "sosa:Observation",
@@ -102,14 +101,11 @@
       "fhir:measurementInterval": "1 hour"
     }
   },
-  "actions":{
-    "fhir:patientButton": {
+  "fhir:patientButton": {
     "@type": "fhir:Action",
     "rdfs:label": "Patient Button",
     "fhir:description": "A button the patient can press to request assistance",
     "fhir:input": "button_press",
     "fhir:result": "Assistance requested"
-     }
-  }
   }
 }
