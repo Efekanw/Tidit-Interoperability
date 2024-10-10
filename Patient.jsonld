@@ -43,6 +43,16 @@
     "sosa:resultTime": "2024-10-09T00:00:00Z"
   },
   "fhir:observations": {
+    "fhir:RespiratoryRate": {
+      "@type": "sosa:Observation",
+      "sosa:observedProperty": {
+        "snomed:code": "86290005",
+        "snomed:display": "Respiratory rate"
+      },
+      "sosa:hasSimpleResult": "16 breaths/min",
+      "sosa:resultTime": "2024-10-09T08:30:00Z",
+      "fhir:measurementInterval": "15 minutes"
+    },
     "fhir:PulseOximetry": {
       "@type": "sosa:Observation",
       "sosa:observedProperty": {
