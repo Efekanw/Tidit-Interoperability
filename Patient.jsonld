@@ -6,7 +6,7 @@
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
   },
-  "@id": "http://example.org/patient/12345",
+  "@id": "patient/1",
   "@type": "fhir:Patient",
   "fhir:identifier": [
     {
@@ -31,7 +31,8 @@
       "fhir:country": "USA"
     }
   ],
-  "health:mentalHealthStatus": "Stable",
+  "properties":{
+    "health:mentalHealthStatus": "Stable",
   "health:physicalHealthStatus": "Moderate physical activity, no chronic conditions.",
   "sosa:observedProperty": {
     "@type": "sosa:Observation",
@@ -101,11 +102,13 @@
       "fhir:measurementInterval": "1 hour"
     }
   },
-  "fhir:patientButton": {
+  "actions":{
+    "fhir:patientButton": {
     "@type": "fhir:Action",
     "rdfs:label": "Patient Button",
     "fhir:description": "A button the patient can press to request assistance",
     "fhir:input": "button_press",
     "fhir:result": "Assistance requested"
+     }
   }
 }
