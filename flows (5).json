@@ -1,0 +1,1607 @@
+[
+    {
+        "id": "db079fae6025e22f",
+        "type": "subflow",
+        "name": "Execute SPARQL Query",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 200,
+                "y": 340,
+                "wires": [
+                    {
+                        "id": "11081d131b0c0885"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 1240,
+                "y": 340,
+                "wires": [
+                    {
+                        "id": "2892ad2081cbec94",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "11081d131b0c0885",
+        "type": "function",
+        "z": "db079fae6025e22f",
+        "name": "Format Query",
+        "func": "msg.payload = `query=${encodeURIComponent(msg.sparqlQuery)}`;\nmsg.headers = { 'Content-Type': 'application/x-www-form-urlencoded' };\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 340,
+        "wires": [
+            [
+                "f1321bd40eee9198"
+            ]
+        ]
+    },
+    {
+        "id": "f1321bd40eee9198",
+        "type": "http request",
+        "z": "db079fae6025e22f",
+        "name": "POST SPARQL Query",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://localhost:3030/office/sparql",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 640,
+        "y": 340,
+        "wires": [
+            [
+                "1ac0e746fc7275f3"
+            ]
+        ]
+    },
+    {
+        "id": "1ac0e746fc7275f3",
+        "type": "xml",
+        "z": "db079fae6025e22f",
+        "name": "Parse XML",
+        "property": "payload",
+        "attr": "",
+        "chr": "",
+        "x": 850,
+        "y": 340,
+        "wires": [
+            [
+                "2892ad2081cbec94",
+                "8891d67ef75cd3f4"
+            ]
+        ]
+    },
+    {
+        "id": "2892ad2081cbec94",
+        "type": "function",
+        "z": "db079fae6025e22f",
+        "name": "Extract Value",
+        "func": "try {\n    // XML içindeki `results` kısmındaki `result`ların ilkini alıyoruz.\n    const result = msg.payload.sparql.results[0].result[0].binding;\n\n    // Güvenli şekilde değerleri ayıklıyoruz.\n    const nemBinding = result.find(binding => binding.$.name === 'nem');\n    const temperatureBinding = result.find(binding => binding.$.name === 'sicaklik');\n    const sensorBinding = result.find(binding => binding.$.name === 'sensor');\n    const occupiedBinding = result.find(binding => binding.$.name === 'occupied');\n    const timeBinding = result.find(binding => binding.$.name === 'time');\n\n\n    msg.payload.nem = nemBinding ? nemBinding.literal[0]._ : null;\n    msg.payload.sicaklik = temperatureBinding ? temperatureBinding.literal[0]._ : null;\n    msg.payload.sensorno = sensorBinding ? sensorBinding.uri[0].split('/').pop() : null;\n    msg.payload.occupied = occupiedBinding ? occupiedBinding.literal[0]._ : null;\n    msg.payload.time = timeBinding ? timeBinding.literal[0]._ : null;\n\n} catch (e) {\n    node.error(`Failed to extract values: ${e.message}`, msg);\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1030,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8891d67ef75cd3f4",
+        "type": "debug",
+        "z": "db079fae6025e22f",
+        "name": "debug 19",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1010,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "1591b95f5a67df18",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "dfd2d41d7b33b877",
+        "type": "template",
+        "z": "1591b95f5a67df18",
+        "name": "SPARQL Query",
+        "field": "payload.query",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "PREFIX sosa1: <https://www.w3.org/ns/sosa#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nPREFIX wd: <https://arge.innova.com.tr/wisenet.ttl#>\n\nINSERT {\n\n  <{{{payload.id}}}_voltage> a sosa1:Observation ;\n      sosa1:observes <{{{payload.deviceId}}}/voltage> ;\n      sosa1:hasSimpleResult \"{{{payload.voltage}}}\"^^xsd:float ;\n      sosa1:madeBySensor <{{{payload.deviceId}}}> ;\n      sosa1:resultTime \"{{{payload.time}}}\"^^xsd:dateTime .\n  \n  <{{{payload.id}}}_current> a sosa1:Observation ;\n      sosa1:observes <{{{payload.deviceId}}}/current> ;\n      sosa1:hasSimpleResult \"{{{payload.current}}}\"^^xsd:float ;\n      sosa1:madeBySensor <{{{payload.deviceId}}}> ;\n      sosa1:resultTime \"{{{payload.time}}}\"^^xsd:dateTime .\n\n  <{{{payload.deviceId}}}> a sosa1:Sensor ;\n      sosa1:observes <{{{payload.deviceId}}}/voltage> ;\n      sosa1:observes <{{{payload.deviceId}}}/current> ;\n}\n",
+        "output": "str",
+        "x": 340,
+        "y": 380,
+        "wires": [
+            [
+                "82ed378a73ee81f8"
+            ]
+        ]
+    },
+    {
+        "id": "82ed378a73ee81f8",
+        "type": "function",
+        "z": "1591b95f5a67df18",
+        "name": "Format Query",
+        "func": "msg.headers = { 'Content-Type': 'application/sparql-update' };\nmsg.payload = (msg.payload.query);\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 380,
+        "wires": [
+            [
+                "c85630e2ac2fea5b"
+            ]
+        ]
+    },
+    {
+        "id": "c85630e2ac2fea5b",
+        "type": "http request",
+        "z": "1591b95f5a67df18",
+        "name": "POST SPARQL Query",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://localhost:3030/tidit/update",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 800,
+        "y": 380,
+        "wires": [
+            [
+                "d6ea291ff999e535"
+            ]
+        ]
+    },
+    {
+        "id": "d6ea291ff999e535",
+        "type": "switch",
+        "z": "1591b95f5a67df18",
+        "name": "Check Status Code",
+        "property": "statusCode",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "204",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1030,
+        "y": 380,
+        "wires": [
+            [
+                "ae90a09832b46b6f"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "5906746c53f7a929",
+        "type": "function",
+        "z": "1591b95f5a67df18",
+        "name": "URL converter",
+        "func": "const baseurl = \"http://localhost:3030/tidit/\";\n\nmsg.payload.deviceId = baseurl + 'energymeter/' + msg.payload.deviceId;\nmsg.payload.id = msg.payload.deviceId + '/'+ msg._msgid\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 120,
+        "y": 380,
+        "wires": [
+            [
+                "dfd2d41d7b33b877"
+            ]
+        ]
+    },
+    {
+        "id": "f5c19c4ccff1bc38",
+        "type": "switch",
+        "z": "1591b95f5a67df18",
+        "name": "If Voltage",
+        "property": "payload['voltage']",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "btwn",
+                "v": "20",
+                "vt": "num",
+                "v2": "50",
+                "v2t": "num"
+            },
+            {
+                "t": "gte",
+                "v": "50",
+                "vt": "num"
+            },
+            {
+                "t": "lt",
+                "v": "20",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 2040,
+        "y": 380,
+        "wires": [
+            [
+                "2a636c39674d638b",
+                "2bcc81002a6602f9"
+            ],
+            [],
+            [
+                "37600e02cfc7961f",
+                "7840f30c1ef9e868"
+            ]
+        ]
+    },
+    {
+        "id": "2d9b25f27fe1fb48",
+        "type": "mqtt in",
+        "z": "1591b95f5a67df18",
+        "d": true,
+        "name": "",
+        "topic": "device",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "34c0b4351b3b56ca",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 70,
+        "y": 280,
+        "wires": [
+            [
+                "5906746c53f7a929"
+            ]
+        ]
+    },
+    {
+        "id": "98d4367591905dea",
+        "type": "subflow:db079fae6025e22f",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "x": 1810,
+        "y": 380,
+        "wires": [
+            [
+                "f5c19c4ccff1bc38",
+                "33522bc2c803b74b"
+            ]
+        ]
+    },
+    {
+        "id": "ae90a09832b46b6f",
+        "type": "template",
+        "z": "1591b95f5a67df18",
+        "name": "SPARQL Query",
+        "field": "sparqlQuery",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "PREFIX sosa: <https://www.w3.org/ns/sosa#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nPREFIX wd: <https://arge.innova.com.tr/wisenet.ttl#>\nPREFIX td: <http://www.w3.org/ns/td#>\n\nSELECT ?sensor ?property ?property2 ?voltage ?current ?time ?occupied\nWHERE {\n  # Sıcaklık ve nem gözlemlerini buluyoruz\n  {\n    ?property td:description \"voltage\" .\n    ?observation a sosa:Observation ;\n                 sosa:observes ?property ;\n                 sosa:hasSimpleResult ?voltage ;\n                 sosa:resultTime ?time ;\n                 sosa:madeBySensor ?sensor .\n    ?property2 td:description \"current\" .\n    ?observation2 a sosa:Observation ;\n                 sosa:observes ?property2 ;\n                 sosa:hasSimpleResult ?current ;\n                 sosa:resultTime ?time ;\n                 sosa:madeBySensor ?sensor .\n  }\n\n}\nORDER BY DESC(?time)\nLIMIT 1\n",
+        "output": "str",
+        "x": 1240,
+        "y": 360,
+        "wires": [
+            [
+                "98d4367591905dea"
+            ]
+        ]
+    },
+    {
+        "id": "33522bc2c803b74b",
+        "type": "switch",
+        "z": "1591b95f5a67df18",
+        "name": "If Time",
+        "property": "payload['time']",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "btwn",
+                "v": "20",
+                "vt": "num",
+                "v2": "50",
+                "v2t": "num"
+            },
+            {
+                "t": "gte",
+                "v": "50",
+                "vt": "num"
+            },
+            {
+                "t": "lt",
+                "v": "20",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 2050,
+        "y": 660,
+        "wires": [
+            [
+                "35a5bf58848c1355",
+                "1814daad6ef0332c"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "2a636c39674d638b",
+        "type": "debug",
+        "z": "1591b95f5a67df18",
+        "name": "High Voltage",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2210,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "37600e02cfc7961f",
+        "type": "debug",
+        "z": "1591b95f5a67df18",
+        "name": "Low Voltage",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2210,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "35a5bf58848c1355",
+        "type": "debug",
+        "z": "1591b95f5a67df18",
+        "name": "Out of Work",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2250,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "1814daad6ef0332c",
+        "type": "change",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.event",
+                "pt": "msg",
+                "to": "outWorkUsage",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2860,
+        "y": 160,
+        "wires": [
+            [
+                "0956f3f46dc57464"
+            ]
+        ]
+    },
+    {
+        "id": "2bcc81002a6602f9",
+        "type": "change",
+        "z": "1591b95f5a67df18",
+        "name": "High Voltage",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.event",
+                "pt": "msg",
+                "to": "highVoltage",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2270,
+        "y": 340,
+        "wires": [
+            [
+                "0956f3f46dc57464"
+            ]
+        ]
+    },
+    {
+        "id": "7840f30c1ef9e868",
+        "type": "change",
+        "z": "1591b95f5a67df18",
+        "name": "Low Voltage",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.event",
+                "pt": "msg",
+                "to": "lowVoltage",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2270,
+        "y": 420,
+        "wires": [
+            [
+                "0956f3f46dc57464"
+            ]
+        ]
+    },
+    {
+        "id": "0956f3f46dc57464",
+        "type": "template",
+        "z": "1591b95f5a67df18",
+        "name": "SPARQL Query SubEvent",
+        "field": "sparqlQuery",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "PREFIX td: <https://www.w3.org/2019/wot/td#>\nPREFIX event: <https://motools.sourceforge.net/event/event.html#>\n\nSELECT ?subEvent\nWHERE {\n  <{{{id}}}>  a td:Thing ;\n         td:hasEventAffordance ?event .\n  ?event a event:Event ;\n         td:name <{{{event}}}> ;\n         event:subEvent ?subEvent .\n}\n",
+        "output": "str",
+        "x": 2650,
+        "y": 360,
+        "wires": [
+            [
+                "c083cb24184d7df2"
+            ]
+        ]
+    },
+    {
+        "id": "c083cb24184d7df2",
+        "type": "subflow:db079fae6025e22f",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "x": 2910,
+        "y": 360,
+        "wires": [
+            [
+                "1dd5c8d9d7674025"
+            ]
+        ]
+    },
+    {
+        "id": "1dd5c8d9d7674025",
+        "type": "switch",
+        "z": "1591b95f5a67df18",
+        "name": "Which SubEvent",
+        "property": "payload['subevent']",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "activationProtectionRelay",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "outWorkUsage",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 3140,
+        "y": 360,
+        "wires": [
+            [
+                "0cbfb782e7619767"
+            ],
+            [
+                "33522bc2c803b74b"
+            ]
+        ]
+    },
+    {
+        "id": "0cbfb782e7619767",
+        "type": "template",
+        "z": "1591b95f5a67df18",
+        "name": "SPARQL Query SubEvent Activation Protection Relay",
+        "field": "sparqlQuery",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "PREFIX td: <https://www.w3.org/2019/wot/td#>\nPREFIX event: <https://motools.sourceforge.net/event/event.html#>\n\nSELECT ?subEvent\nWHERE {\n  <{{{id}}}>  a td:Thing ;\n         td:hasEventAffordance ?event .\n  ?event a event:Event ;\n         td:name <{{{event}}}> ;\n         event:subEvent ?subEvent .\n}\n",
+        "output": "str",
+        "x": 3280,
+        "y": 200,
+        "wires": [
+            [
+                "1b8250e9dd21cb4b"
+            ]
+        ]
+    },
+    {
+        "id": "1b8250e9dd21cb4b",
+        "type": "subflow:db079fae6025e22f",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "x": 3670,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7a35c31101b4b205",
+        "type": "debug",
+        "z": "1591b95f5a67df18",
+        "name": "debug 20",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 340,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "b820a36defbf36b1",
+        "type": "function",
+        "z": "1591b95f5a67df18",
+        "name": "function 1",
+        "func": "const thingId = msg.payload.thingId; \nlet topic = msg.topic.split(\"/\");\nlet patientInfo = topic[topic.length - 1];\nconsole.log(patientInfo);\nmsg.thingId = patientInfo;\nmsg.observations = msg.payload.value\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 620,
+        "wires": [
+            [
+                "739ab2492f901baf",
+                "3033b848d416b7d4"
+            ]
+        ]
+    },
+    {
+        "id": "739ab2492f901baf",
+        "type": "http request",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://nginx/api/2/things/{{thingId}}/definition",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 530,
+        "y": 580,
+        "wires": [
+            [
+                "88f2d408f36e45b1",
+                "9d1497f436bb6ad3"
+            ]
+        ]
+    },
+    {
+        "id": "3033b848d416b7d4",
+        "type": "debug",
+        "z": "1591b95f5a67df18",
+        "name": "debug 22",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 510,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "88f2d408f36e45b1",
+        "type": "debug",
+        "z": "1591b95f5a67df18",
+        "name": "debug 23",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 720,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "9d1497f436bb6ad3",
+        "type": "function",
+        "z": "1591b95f5a67df18",
+        "name": "thing url",
+        "func": "let rawUrl = msg.payload; \nif (rawUrl.startsWith('\"') && rawUrl.endsWith('\"')) {\n    msg.url = rawUrl.slice(1, -1);\n} else {\n    msg.url = rawUrl; \n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 660,
+        "wires": [
+            [
+                "41de494d2bfe7d0f",
+                "5de21ced33bc76c6"
+            ]
+        ]
+    },
+    {
+        "id": "41de494d2bfe7d0f",
+        "type": "http request",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "{{{url}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 850,
+        "y": 660,
+        "wires": [
+            [
+                "2aea0936df5e1da8"
+            ]
+        ]
+    },
+    {
+        "id": "5de21ced33bc76c6",
+        "type": "debug",
+        "z": "1591b95f5a67df18",
+        "name": "debug 24",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "2aea0936df5e1da8",
+        "type": "json",
+        "z": "1591b95f5a67df18",
+        "name": "Parse JSON",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 1050,
+        "y": 660,
+        "wires": [
+            [
+                "b2eec9777bca6312"
+            ]
+        ]
+    },
+    {
+        "id": "b2eec9777bca6312",
+        "type": "function",
+        "z": "1591b95f5a67df18",
+        "name": "Process Data",
+        "func": "msg.td = msg.payload; \nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1260,
+        "y": 660,
+        "wires": [
+            [
+                "d0cbaa84178b2573",
+                "036a9951aae7d721"
+            ]
+        ]
+    },
+    {
+        "id": "d0cbaa84178b2573",
+        "type": "debug",
+        "z": "1591b95f5a67df18",
+        "name": "Debug Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1460,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "4addce8e9bb1840c",
+        "type": "mqtt in",
+        "z": "1591b95f5a67df18",
+        "name": "ditto",
+        "topic": "test/ditto/#",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "85e0534a774b74fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 310,
+        "y": 100,
+        "wires": [
+            [
+                "304bbe364141b3a9"
+            ]
+        ]
+    },
+    {
+        "id": "304bbe364141b3a9",
+        "type": "debug",
+        "z": "1591b95f5a67df18",
+        "name": "debug 26",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 560,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "3939e16fbb43c0c2",
+        "type": "mqtt in",
+        "z": "1591b95f5a67df18",
+        "name": "ditto",
+        "topic": "test/ditto/#",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "85e0534a774b74fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 90,
+        "y": 540,
+        "wires": [
+            [
+                "b820a36defbf36b1",
+                "7a35c31101b4b205"
+            ]
+        ]
+    },
+    {
+        "id": "85a7c0d000b94db5",
+        "type": "template",
+        "z": "1591b95f5a67df18",
+        "name": "SPARQL Query",
+        "field": "payload.query",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "PREFIX fhir: <https://www.hl7.org/fhir/>\nPREFIX sosa: <http://www.w3.org/ns/sosa#>\nPREFIX snomed: <http://purl.bioontology.org/ontology/SNOMEDCT/>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n\nINSERT DATA {\n  <{{{payload.patient_id}}}> fhir:observations [\n    fhir:RespiratoryRate [\n      rdf:type sosa:Observation ;\n      fhir:identifier [\n        fhir:value \"{{{payload.id}}}\"\n      ] ;\n      sosa:hasSimpleResult \"{{{payload.result}}}\" ;\n      sosa:observedProperty [\n        snomed:code \"86290005\" ;\n        snomed:display \"Respiratory rate\"\n      ] ;\n      sosa:resultTime \"{{{payload.time}}}\" ;\n      fhir:measurementInterval \"15 minutes\"\n    ]\n  ] .\n}\n",
+        "output": "str",
+        "x": 1740,
+        "y": 940,
+        "wires": [
+            [
+                "5d4a225130edfe54"
+            ]
+        ]
+    },
+    {
+        "id": "5d4a225130edfe54",
+        "type": "function",
+        "z": "1591b95f5a67df18",
+        "name": "Format Query",
+        "func": "msg.headers = { 'Content-Type': 'application/sparql-update' };\nmsg.payload = (msg.payload.query);\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1940,
+        "y": 940,
+        "wires": [
+            [
+                "e9f0f95071ef846f"
+            ]
+        ]
+    },
+    {
+        "id": "e9f0f95071ef846f",
+        "type": "http request",
+        "z": "1591b95f5a67df18",
+        "name": "POST SPARQL Query",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://fuseki:3030/p/update",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 2160,
+        "y": 940,
+        "wires": [
+            [
+                "f821b97762c4648b"
+            ]
+        ]
+    },
+    {
+        "id": "f821b97762c4648b",
+        "type": "switch",
+        "z": "1591b95f5a67df18",
+        "name": "Check Status Code",
+        "property": "statusCode",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "204",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 2390,
+        "y": 940,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "036a9951aae7d721",
+        "type": "function",
+        "z": "1591b95f5a67df18",
+        "name": "observation types",
+        "func": "// Girdi olarak gelen veriden observation türlerini ayıkla\nfunction extractObservationTypes(payload) {\n    let observationTypes = [];\n\n    // fhir:observations altındaki tüm gözlemleri al\n    let observations = payload[\"fhir:observations\"];\n\n    // Her gözlemi gez ve türlerini ayıkla\n    for (let key in observations) {\n        if (observations.hasOwnProperty(key)) {\n            let observationType = observations[key][\"sosa:observedProperty\"][\"snomed:display\"];\n            observationTypes.push(observationType);\n        }\n    }\n\n    return observationTypes;\n}\nmsg.observationTypes = extractObservationTypes(msg.td);\n\nreturn msg",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 780,
+        "wires": [
+            [
+                "2db697d2c23a7eb1"
+            ]
+        ]
+    },
+    {
+        "id": "2db697d2c23a7eb1",
+        "type": "switch",
+        "z": "1591b95f5a67df18",
+        "name": "Observation Types",
+        "property": "observationTypes",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "Respiratory rate",
+                "vt": "str"
+            },
+            {
+                "t": "cont",
+                "v": "Pulse oximetry",
+                "vt": "str"
+            },
+            {
+                "t": "cont",
+                "v": "Heart rate",
+                "vt": "str"
+            },
+            {
+                "t": "cont",
+                "v": "Blood pressure",
+                "vt": "str"
+            },
+            {
+                "t": "cont",
+                "v": "Body temperature",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 5,
+        "x": 790,
+        "y": 920,
+        "wires": [
+            [
+                "29d539ce331ebe83"
+            ],
+            [
+                "0fdab54984878b8a"
+            ],
+            [
+                "e86e79bb3408f5bb"
+            ],
+            [
+                "9e7f5454547324c4"
+            ],
+            [
+                "d95916a30646a63b"
+            ]
+        ]
+    },
+    {
+        "id": "29d539ce331ebe83",
+        "type": "switch",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "property": "observations.properties[\"Respiratory rate\"]",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 970,
+        "y": 800,
+        "wires": [
+            [
+                "076589e5a0118a4c",
+                "250f519d2e4d3187"
+            ]
+        ]
+    },
+    {
+        "id": "076589e5a0118a4c",
+        "type": "switch",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "property": "observations.properties[\"Respiratory rate\"]",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "btwn",
+                "v": "8",
+                "vt": "num",
+                "v2": "24",
+                "v2t": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1110,
+        "y": 800,
+        "wires": [
+            [
+                "f3d5a103f1df5ce1"
+            ],
+            [
+                "746308d6fc40bf71"
+            ]
+        ]
+    },
+    {
+        "id": "1b4a5e4f2d610ebc",
+        "type": "function",
+        "z": "1591b95f5a67df18",
+        "name": "URL converter",
+        "func": "const baseurl = \"http://localhost:3030/p/\";\n\nmsg.payload.patient_id = baseurl + msg.payload[\"@id\"]\nmsg.payload.id = msg.payload.patient_id + '/'+ msg._msgid\nmsg.payload.result = msg.observations.properties[\"Pulse oximetry\"]\nmsg.payload.time = msg.observations.properties[\"time\"]\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1480,
+        "y": 880,
+        "wires": [
+            [
+                "85a7c0d000b94db5"
+            ]
+        ]
+    },
+    {
+        "id": "0fdab54984878b8a",
+        "type": "switch",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "property": "observations.properties[\"Pulse oximetry\"]",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 970,
+        "y": 880,
+        "wires": [
+            [
+                "438b43cd793c2622",
+                "1b4a5e4f2d610ebc"
+            ]
+        ]
+    },
+    {
+        "id": "e86e79bb3408f5bb",
+        "type": "switch",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "property": "observations.properties[\"Heart rate\"]",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 970,
+        "y": 940,
+        "wires": [
+            [
+                "30623917d2628a28",
+                "c38f2ee338ed01ae"
+            ]
+        ]
+    },
+    {
+        "id": "c38f2ee338ed01ae",
+        "type": "function",
+        "z": "1591b95f5a67df18",
+        "name": "URL converter",
+        "func": "const baseurl = \"http://localhost:3030/p/\";\n\nmsg.payload.patient_id = baseurl + msg.payload[\"@id\"]\nmsg.payload.id = msg.payload.patient_id + '/'+ msg._msgid\nmsg.payload.result = msg.observations.properties[\"Heart rate\"]\nmsg.payload.time = msg.observations.properties[\"time\"]\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1480,
+        "y": 940,
+        "wires": [
+            [
+                "85a7c0d000b94db5"
+            ]
+        ]
+    },
+    {
+        "id": "9e7f5454547324c4",
+        "type": "switch",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "property": "observations.properties[\"Blood pressure\"]",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 970,
+        "y": 1020,
+        "wires": [
+            [
+                "4861a80d8c9170af",
+                "32b216dad5e3178f"
+            ]
+        ]
+    },
+    {
+        "id": "32b216dad5e3178f",
+        "type": "function",
+        "z": "1591b95f5a67df18",
+        "name": "URL converter",
+        "func": "const baseurl = \"http://localhost:3030/p/\";\n\nmsg.payload.patient_id = baseurl + msg.payload[\"@id\"]\nmsg.payload.id = msg.payload.patient_id + '/'+ msg._msgid\nmsg.payload.result = msg.observations.properties[\"Blood pressure\"]\nmsg.payload.time = msg.observations.properties[\"time\"]\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1460,
+        "y": 1000,
+        "wires": [
+            [
+                "85a7c0d000b94db5"
+            ]
+        ]
+    },
+    {
+        "id": "bc1d16bdd0652dfe",
+        "type": "function",
+        "z": "1591b95f5a67df18",
+        "name": "URL converter",
+        "func": "const baseurl = \"http://localhost:3030/p/\";\n\nmsg.payload.patient_id = baseurl + msg.payload[\"@id\"]\nmsg.payload.id = msg.payload.patient_id + '/'+ msg._msgid\nmsg.payload.result = msg.observations.properties[\"Body temperature\"]\nmsg.payload.time = msg.observations.properties[\"time\"]\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1460,
+        "y": 1100,
+        "wires": [
+            [
+                "85a7c0d000b94db5"
+            ]
+        ]
+    },
+    {
+        "id": "d95916a30646a63b",
+        "type": "switch",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "property": "observations.properties[\"Body temperature\"]",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 970,
+        "y": 1100,
+        "wires": [
+            [
+                "9543baecfa09bb15",
+                "bc1d16bdd0652dfe"
+            ]
+        ]
+    },
+    {
+        "id": "3abfe8504c31cc42",
+        "type": "debug",
+        "z": "1591b95f5a67df18",
+        "name": "debug 27",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1820,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "5ab16ad214a59da6",
+        "type": "template",
+        "z": "1591b95f5a67df18",
+        "d": true,
+        "name": "SPARQL Query",
+        "field": "payload.query",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "PREFIX health: <http://example.org/health#>\n\nDELETE {\n  <{{{payload.patient_id}}}> <health:physicalHealthStatus> ?currentStatus .\n}\nINSERT {\n  <{{{payload.patient_id}}}> <health:physicalHealthStatus> \"bad\" .\n}\nWHERE {\n  <{{{payload.patient_id}}}> <health:physicalHealthStatus> ?currentStatus .\n  FILTER ( \"{{{payload.physical_status}}}\" = \"bad\" )\n}\n",
+        "output": "str",
+        "x": 2100,
+        "y": 760,
+        "wires": [
+            [
+                "5d4a225130edfe54"
+            ]
+        ]
+    },
+    {
+        "id": "250f519d2e4d3187",
+        "type": "function",
+        "z": "1591b95f5a67df18",
+        "name": "URL converter",
+        "func": "const baseurl = \"http://localhost:3030/p/\";\n\nmsg.payload.patient_id = baseurl + msg.payload[\"@id\"]\nmsg.payload.id = msg.payload.patient_id + '/'+ msg._msgid\nmsg.payload.result = msg.observations.properties[\"Respiratory rate\"]\nmsg.payload.time = msg.observations.properties[\"time\"]\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1480,
+        "y": 800,
+        "wires": [
+            [
+                "85a7c0d000b94db5",
+                "3abfe8504c31cc42",
+                "5ab16ad214a59da6"
+            ]
+        ]
+    },
+    {
+        "id": "438b43cd793c2622",
+        "type": "switch",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "property": "observations.properties[\"Pulse oximetry\"]",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "btwn",
+                "v": "8",
+                "vt": "num",
+                "v2": "24",
+                "v2t": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1090,
+        "y": 880,
+        "wires": [
+            [
+                "f3d5a103f1df5ce1"
+            ],
+            [
+                "746308d6fc40bf71"
+            ]
+        ]
+    },
+    {
+        "id": "30623917d2628a28",
+        "type": "switch",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "property": "observations.properties[\"Heart rate\"]",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "btwn",
+                "v": "8",
+                "vt": "num",
+                "v2": "24",
+                "v2t": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1090,
+        "y": 940,
+        "wires": [
+            [
+                "f3d5a103f1df5ce1"
+            ],
+            [
+                "746308d6fc40bf71"
+            ]
+        ]
+    },
+    {
+        "id": "9543baecfa09bb15",
+        "type": "switch",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "property": "observations.properties[\"Body temperature\"]",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "btwn",
+                "v": "8",
+                "vt": "num",
+                "v2": "24",
+                "v2t": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1090,
+        "y": 1100,
+        "wires": [
+            [
+                "f3d5a103f1df5ce1"
+            ],
+            [
+                "746308d6fc40bf71"
+            ]
+        ]
+    },
+    {
+        "id": "4861a80d8c9170af",
+        "type": "switch",
+        "z": "1591b95f5a67df18",
+        "name": "",
+        "property": "observations.properties[\"Blood pressure\"]",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "btwn",
+                "v": "8",
+                "vt": "num",
+                "v2": "24",
+                "v2t": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1090,
+        "y": 1020,
+        "wires": [
+            [
+                "f3d5a103f1df5ce1"
+            ],
+            [
+                "746308d6fc40bf71"
+            ]
+        ]
+    },
+    {
+        "id": "f3d5a103f1df5ce1",
+        "type": "function",
+        "z": "1591b95f5a67df18",
+        "name": "True",
+        "func": "msg.pyhsical_status = msg.physical_status * 1\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1270,
+        "y": 840,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "746308d6fc40bf71",
+        "type": "function",
+        "z": "1591b95f5a67df18",
+        "name": "False",
+        "func": "msg.pyhsical_status = msg.physical_status * 0\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1270,
+        "y": 1060,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "045569f12051f099",
+        "type": "ui_spacer",
+        "z": "1591b95f5a67df18",
+        "name": "spacer",
+        "group": "0e320e8f5c521eb7",
+        "order": 5,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "dc594aa3ef766b9c",
+        "type": "ui_spacer",
+        "z": "1591b95f5a67df18",
+        "name": "spacer",
+        "group": "0e320e8f5c521eb7",
+        "order": 4,
+        "width": "1",
+        "height": "1"
+    },
+    {
+        "id": "34c0b4351b3b56ca",
+        "type": "mqtt-broker",
+        "name": "iot-data-sim",
+        "broker": "172.31.32.1",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "85e0534a774b74fa",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "mqtt",
+        "port": "1883",
+        "clientid": "ditto",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "0e320e8f5c521eb7",
+        "type": "ui_group",
+        "name": "Dashboard",
+        "tab": "",
+        "order": 1,
+        "disp": true,
+        "width": "16",
+        "collapse": true,
+        "className": ""
+    }
+]

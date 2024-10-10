@@ -31,6 +31,32 @@
       "fhir:country": "USA"
     }
   ],
+  "fhir:contact": [
+    {
+      "fhir:relationship": [
+        {
+          "fhir:code": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                "code": "NOK",
+                "display": "Next of Kin"
+              }
+            ]
+          }
+        }
+      ],
+      "fhir:name": {
+        "fhir:text": "Jane Doe"
+      },
+      "fhir:telecom": [
+        {
+          "fhir:system": "phone",
+          "fhir:value": "+1-555-123-4567"
+        }
+      ]
+    }
+  ],
   "health:mentalHealthStatus": "Stable",
   "health:physicalHealthStatus": "Moderate physical activity, no chronic conditions.",
   "sosa:observedProperty": {
@@ -41,71 +67,5 @@
       "snomed:display": "Patient Needs"
     },
     "sosa:resultTime": "2024-10-09T00:00:00Z"
-  },
-  "fhir:observations": {
-    "fhir:RespiratoryRate": {
-      "@type": "sosa:Observation",
-      "sosa:observedProperty": {
-        "snomed:code": "86290005",
-        "snomed:display": "Respiratory rate"
-      },
-      "sosa:hasSimpleResult": "16 breaths/min",
-      "sosa:resultTime": "2024-10-09T08:30:00Z",
-      "fhir:measurementInterval": "15 minutes"
-    },
-    "fhir:PulseOximetry": {
-      "@type": "sosa:Observation",
-      "sosa:observedProperty": {
-        "snomed:code": "431314004",
-        "snomed:display": "Pulse oximetry"
-      },
-      "sosa:hasSimpleResult": "98%",
-      "sosa:resultTime": "2024-10-09T08:30:00Z",
-      "fhir:measurementInterval": "15 minutes"
-    },
-    "fhir:PulseRate": {
-      "@type": "sosa:Observation",
-      "sosa:observedProperty": {
-        "snomed:code": "366199006",
-        "snomed:display": "Heart rate"
-      },
-      "sosa:hasSimpleResult": "75 bpm",
-      "sosa:resultTime": "2024-10-09T08:30:00Z",
-      "fhir:measurementInterval": "15 minutes"
-    },
-    "fhir:BloodPressure": {
-      "@type": "sosa:Observation",
-      "sosa:observedProperty": {
-        "snomed:code": "75367002",
-        "snomed:display": "Blood pressure"
-      },
-      "fhir:component": {
-        "fhir:systolic": {
-          "sosa:hasSimpleResult": "120 mmHg"
-        },
-        "fhir:diastolic": {
-          "sosa:hasSimpleResult": "80 mmHg"
-        }
-      },
-      "sosa:resultTime": "2024-10-09T08:30:00Z",
-      "fhir:measurementInterval": "30 minutes"
-    },
-    "fhir:Temperature": {
-      "@type": "sosa:Observation",
-      "sosa:observedProperty": {
-        "snomed:code": "56342008",
-        "snomed:display": "Body temperature"
-      },
-      "sosa:hasSimpleResult": "36.7°C",
-      "sosa:resultTime": "2024-10-09T08:30:00Z",
-      "fhir:measurementInterval": "1 hour"
-    }
-  },
-  "fhir:patientButton": {
-    "@type": "fhir:Action",
-    "rdfs:label": "Patient Button",
-    "fhir:description": "A button the patient can press to request assistance",
-    "fhir:input": "button_press",
-    "fhir:result": "Assistance requested"
   }
 }
