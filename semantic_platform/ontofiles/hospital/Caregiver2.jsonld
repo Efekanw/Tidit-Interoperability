@@ -1,0 +1,46 @@
+{
+  "@context": {
+    "sosa": "http://www.w3.org/ns/sosa#",
+    "snomed": "http://purl.bioontology.org/ontology/SNOMEDCT/",
+    "fhir": "https://www.hl7.org/fhir/",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@id": "caregiver/2",
+  "@type": "fhir:Practitioner",
+  "fhir:identifier": [
+    {
+      "fhir:system": "http://hospital.example.org/caregivers",
+      "fhir:value": "caregiver-id-5690"
+    }
+  ],
+  "fhir:name": [
+    {
+      "fhir:use": "official",
+      "fhir:text": "Ashley Smith"
+    }
+  ],
+  "fhir:gender": "female",
+  "fhir:address": [
+    {
+      "fhir:line": ["456 Healthcare St"],
+      "fhir:city": "Anytown",
+      "fhir:state": "CA",
+      "fhir:postalCode": "959",
+      "fhir:country": "USA"
+    }
+  ],
+  "fhir:availability": {
+    "@type": "sosa:Observation",
+    "sosa:observedProperty": {
+      "snomed:code": "394738000",
+      "snomed:display": "Availability status"
+    },
+    "sosa:hasSimpleResult": "Available",
+    "sosa:resultTime": "2024-10-09T08:00:00Z"
+  },
+  "fhir:experienceLevel": {
+    "@type": "fhir:CodeableConcept",
+    "fhir:text": "Expert"
+  }
+}
