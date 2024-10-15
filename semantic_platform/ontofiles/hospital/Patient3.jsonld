@@ -1,0 +1,126 @@
+{
+  "@context": {
+    "sosa": "http://www.w3.org/ns/sosa#",
+    "snomed": "http://purl.bioontology.org/ontology/SNOMEDCT/",
+    "fhir": "https://www.hl7.org/fhir/",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@id": "patient/3",
+  "@type": "fhir:Patient",
+  "fhir:identifier": [
+    {
+      "fhir:system": "http://hospital.example.org/patients",
+      "fhir:value": "patient-id-12345"
+    }
+  ],
+  "fhir:name": [
+    {
+      "fhir:use": "official",
+      "fhir:text": "William Turner"
+    }
+  ],
+  "fhir:gender": "male",
+  "fhir:birthDate": "1989-01-01",
+  "fhir:address": [
+    {
+      "fhir:line": ["123 Main St"],
+      "fhir:city": "Anytown",
+      "fhir:state": "CA",
+      "fhir:postalCode": "12345",
+      "fhir:country": "USA"
+    }
+  ],
+  "snomed:373942005": {
+    "@type": "sosa:Observation",
+    "sosa:hasSimpleResult": "Stable",
+    "sosa:resultTime": "2024-10-09T08:30:00Z",
+    "rdfs:label": "Mental Health Status"
+  },
+  "snomed:248536006": {
+    "@type": "sosa:Observation",
+    "sosa:hasSimpleResult": "Moderate physical activity, no chronic conditions",
+    "sosa:resultTime": "2024-10-09T08:30:00Z",
+    "rdfs:label": "Physical Health Status"
+  },
+  "sosa:observedProperty": {
+    "@type": "sosa:Observation",
+    "sosa:hasFeatureOfInterest": {
+      "@type": "sosa:ObservedProperty",
+      "snomed:code": "116154003",
+      "snomed:display": "Patient Needs"
+    },
+    "sosa:resultTime": "2024-10-09T00:00:00Z"
+  },
+  "fhir:observations": {
+    "fhir:RespiratoryRate": {
+      "@type": "sosa:Observation",
+      "sosa:observedProperty": {
+        "snomed:code": "86290005",
+        "snomed:display": "Respiratory rate"
+      },
+      "sosa:hasSimpleResult": "16 breaths/min",
+      "sosa:resultTime": "2024-10-09T08:30:00Z",
+      "fhir:measurementInterval": "15 minutes"
+    },
+    "fhir:PulseOximetry": {
+      "@type": "sosa:Observation",
+      "sosa:observedProperty": {
+        "snomed:code": "431314004",
+        "snomed:display": "Pulse oximetry"
+      },
+      "sosa:hasSimpleResult": "98%",
+      "sosa:resultTime": "2024-10-09T08:30:00Z",
+      "fhir:measurementInterval": "15 minutes"
+    },
+    "fhir:PulseRate": {
+      "@type": "sosa:Observation",
+      "sosa:observedProperty": {
+        "snomed:code": "366199006",
+        "snomed:display": "Heart rate"
+      },
+      "sosa:hasSimpleResult": "75 bpm",
+      "sosa:resultTime": "2024-10-09T08:30:00Z",
+      "fhir:measurementInterval": "15 minutes"
+    },
+    "fhir:BloodPressure": {
+      "@type": "sosa:Observation",
+      "sosa:observedProperty": {
+        "snomed:code": "75367002",
+        "snomed:display": "Blood pressure"
+      },
+      "fhir:component": {
+        "fhir:systolic": {
+          "sosa:hasSimpleResult": "120 mmHg"
+        },
+        "fhir:diastolic": {
+          "sosa:hasSimpleResult": "80 mmHg"
+        }
+      },
+      "sosa:resultTime": "2024-10-09T08:30:00Z",
+      "fhir:measurementInterval": "30 minutes"
+    },
+    "fhir:Temperature": {
+      "@type": "sosa:Observation",
+      "sosa:observedProperty": {
+        "snomed:code": "56342008",
+        "snomed:display": "Body temperature"
+      },
+      "sosa:hasSimpleResult": "36.7°C",
+      "sosa:resultTime": "2024-10-09T08:30:00Z",
+      "fhir:measurementInterval": "1 hour"
+    }
+  },
+  "fhir:patientButton": {
+    "@type": "fhir:Action",
+    "rdfs:label": "Patient Button",
+    "fhir:description": "A button the patient can press to request assistance",
+    "fhir:input": "button_press",
+    "fhir:result": "Assistance requested"
+  },
+  "fhir:status": {
+    "@type": "fhir:Status",
+    "fhir:value": "green",
+    "rdfs:label": "Patient Status"
+  }
+}
