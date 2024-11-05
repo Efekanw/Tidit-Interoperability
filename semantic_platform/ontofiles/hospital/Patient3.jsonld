@@ -17,7 +17,7 @@
   "fhir:name": [
     {
       "fhir:use": "official",
-      "fhir:text": "William Turner"
+      "fhir:text": "Matej Potočnik"
     }
   ],
   "fhir:gender": "male",
