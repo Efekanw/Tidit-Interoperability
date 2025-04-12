@@ -8,6 +8,11 @@
   },
   "@id": "patient/3",
   "@type": "fhir:Patient",
+  "fhir:room": {
+    "@type": "fhir:Location",
+    "fhir:identifier": "3",
+    "rdfs:label": "Patient Room"
+  },
   "fhir:identifier": [
     {
       "fhir:system": "http://hospital.example.org/patients",

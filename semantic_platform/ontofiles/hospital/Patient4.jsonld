@@ -6,34 +6,34 @@
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
   },
-  "@id": "patient/2",
+  "@id": "patient/4",
   "@type": "fhir:Patient",
   "fhir:room": {
     "@type": "fhir:Location",
-    "fhir:identifier": "2",
+    "fhir:identifier": "4",
     "rdfs:label": "Patient Room"
   },
   "fhir:identifier": [
     {
       "fhir:system": "http://hospital.example.org/patients",
-      "fhir:value": "patient-id-12345"
+      "fhir:value": "patient-id-5"
     }
   ],
   "fhir:name": [
     {
       "fhir:use": "official",
-      "fhir:text": "Maja Horvat"
+      "fhir:text": "Zuzana Kováčová"
     }
   ],
   "fhir:gender": "female",
-  "fhir:birthDate": "1990-11-01",
+  "fhir:birthDate": "1987-02-01",
   "fhir:address": [
     {
-      "fhir:line": ["123 St"],
-      "fhir:city": "Anytown",
-      "fhir:state": "CA",
-      "fhir:postalCode": "42112",
-      "fhir:country": "Turkey"
+      "fhir:line": ["Štefánikova 14"],
+      "fhir:city": "Bratislava",
+      "fhir:state": "Bratislavský kraj",
+      "fhir:postalCode": "811 05",
+      "fhir:country": "Slovakia"
     }
   ],
   "snomed:373942005": {
@@ -48,6 +48,15 @@
     "sosa:resultTime": "2024-10-09T08:30:00Z",
     "rdfs:label": "Physical Health Status"
   },
+  "sosa:observedProperty": {
+    "@type": "sosa:Observation",
+    "sosa:hasFeatureOfInterest": {
+      "@type": "sosa:ObservedProperty",
+      "snomed:code": "116154003",
+      "snomed:display": "Patient Needs"
+    },
+    "sosa:resultTime": "2024-10-09T00:00:00Z"
+  },
   "fhir:observations": {
     "fhir:RespiratoryRate": {
       "@type": "sosa:Observation",
@@ -55,6 +64,8 @@
         "snomed:code": "86290005",
         "snomed:display": "Respiratory rate"
       },
+      "sosa:hasSimpleResult": "16 breaths/min",
+      "sosa:resultTime": "2024-10-09T08:30:00Z",
       "fhir:measurementInterval": "15 minutes"
     },
     "fhir:PulseOximetry": {
@@ -63,6 +74,8 @@
         "snomed:code": "431314004",
         "snomed:display": "Pulse oximetry"
       },
+      "sosa:hasSimpleResult": "98%",
+      "sosa:resultTime": "2024-10-09T08:30:00Z",
       "fhir:measurementInterval": "15 minutes"
     },
     "fhir:PulseRate": {
@@ -71,6 +84,8 @@
         "snomed:code": "366199006",
         "snomed:display": "Heart rate"
       },
+      "sosa:hasSimpleResult": "75 bpm",
+      "sosa:resultTime": "2024-10-09T08:30:00Z",
       "fhir:measurementInterval": "15 minutes"
     },
     "fhir:BloodPressure": {
@@ -79,6 +94,15 @@
         "snomed:code": "75367002",
         "snomed:display": "Blood pressure"
       },
+      "fhir:component": {
+        "fhir:systolic": {
+          "sosa:hasSimpleResult": "120 mmHg"
+        },
+        "fhir:diastolic": {
+          "sosa:hasSimpleResult": "80 mmHg"
+        }
+      },
+      "sosa:resultTime": "2024-10-09T08:30:00Z",
       "fhir:measurementInterval": "30 minutes"
     },
     "fhir:Temperature": {
@@ -87,6 +111,8 @@
         "snomed:code": "56342008",
         "snomed:display": "Body temperature"
       },
+      "sosa:hasSimpleResult": "36.7°C",
+      "sosa:resultTime": "2024-10-09T08:30:00Z",
       "fhir:measurementInterval": "1 hour"
     }
   },
