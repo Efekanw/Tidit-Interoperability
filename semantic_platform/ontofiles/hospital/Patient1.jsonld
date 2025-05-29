@@ -51,7 +51,7 @@
     "rdfs:label": "Physical Health Status"
   },
   "fhir:observations": {
-    "fhir:RespiratoryRate": {
+    "respiratory_rate": {
       "@type": "sosa:Observation",
       "sosa:observedProperty": {
         "snomed:code": "86290005",
